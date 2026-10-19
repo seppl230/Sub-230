@@ -5,3 +5,22 @@
 @media(max-width:420px){h1{font-size:30px}.goal-number{font-size:55px}.hero-bottom{gap:10px}.stat-grid{grid-template-columns:1fr 1fr}.stat-grid>.stat:nth-child(3){grid-column:span 2}.milestone-row{grid-template-columns:80px 1fr 50px;gap:9px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:1}.input-row{flex-wrap:wrap}.input-row .btn{width:100%}.reminder-grid{grid-template-columns:1fr 1fr}.roadmap-goal{font-size:11px}}
 
 .tiny-link{margin-top:5px;padding:2px 0;border:0;background:none;color:var(--teal);font-size:11px;font-weight:750;text-align:left}
+
+/* v2 – Trainingsradar & Wochenübersicht */
+.trajectory-card{border-color:#2c4f4b;background:linear-gradient(145deg,#14293a,#102130)}
+.track-state{font-size:11px;border:1px solid #4a7568;background:#193b35;color:#9beec6;border-radius:18px;padding:7px 11px;white-space:nowrap;font-weight:760}
+.readiness-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.readiness-metric{background:#0e1e2e;border:1px solid #254153;border-radius:13px;display:flex;flex-direction:column;padding:16px;gap:4px;min-width:0}
+.readiness-metric span{color:#9fb6c8;font-size:12px;font-weight:700}
+.readiness-metric strong{font-size:clamp(16px,2vw,23px);font-weight:820;line-height:1.25;color:#e5fff4}
+.readiness-metric small{font-size:11px;color:#879eb0;line-height:1.45}
+.readiness-disclaimer{color:#8ea7b8;font-size:11px;margin:10px 0 0}
+.extra-overview{margin-bottom:0}.extra-overview>.section-card{min-width:0}
+.week-breakdown{display:flex;flex-direction:column;gap:0}
+.week-breakdown-row{display:grid;grid-template-columns:minmax(145px,1fr) 48px 75px 32px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.week-breakdown-row:last-child{border-bottom:0}
+.week-dates{color:#b5c9d6;font-size:12px}.week-squares{display:flex;gap:5px}.week-square{width:15px;height:15px;border-radius:5px;border:1px solid #526579;background:#1b3043}.week-square.filled{background:var(--teal);border-color:var(--teal)}
+.week-distance{color:#e3fff4;font-size:12px;text-align:right;font-weight:760}.week-count{font-size:12px;text-align:right;color:#91a9bd}
+.next-milestone{display:flex;flex-direction:column;gap:8px;margin:9px 0 18px}.next-milestone strong{font-size:36px;line-height:1.2;color:#d9fff0}.next-milestone span{font-size:13px;color:#a9c1d0}.next-milestone-bar{height:10px}
+@media(max-width:850px){.readiness-grid{grid-template-columns:1fr}.readiness-metric{padding:13px}.week-breakdown-row{grid-template-columns:minmax(120px,1fr) 45px 68px 27px;gap:5px}.week-dates{font-size:11px}}
+@media(min-width:851px) and (max-width:1130px){.readiness-grid{grid-template-columns:repeat(3,1fr)}.week-breakdown-row{grid-template-columns:minmax(115px,1fr) 45px 65px 26px;gap:5px}}
