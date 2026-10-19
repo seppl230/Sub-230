@@ -6,19 +6,19 @@
   <meta name="theme-color" content="#0c1726">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Road 2:30">
-  <meta name="description" content="Dein kostenloses Halbmarathon-Cockpit: Garmin-Import, Lauf-Fortschritt und ChatGPT-Coaching.">
+  <meta name="apple-mobile-web-app-title" content="Sub 230">
+  <meta name="description" content="Dein kostenloses Halbmarathon-Cockpit: Garmin-Import, Trainingsplan und Coaching-Zusammenfassung.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://intervals.icu; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=5">
-  <title>Road to 2:30 | Dein Halbmarathon-Cockpit</title>
+  <link rel="stylesheet" href="styles.css?v=6">
+  <title>Sub 230 | Dein Halbmarathon-Cockpit</title>
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand"><div class="brand-logo">↗</div><div><strong>ROAD TO 2:30</strong><small>Dein Lauf-Cockpit</small></div></div>
+      <div class="brand"><img class="brand-logo-img" src="icon-192.png" alt="Sub 230"><div><strong>SUB 230</strong><small>Dein Lauf-Cockpit</small></div></div>
       <div class="side-head">MENÜ</div>
       <nav class="desktop-nav" aria-label="Navigation">
         <button class="nav-btn active" data-tab="overview"><span>◫</span> Übersicht</button>
@@ -31,16 +31,16 @@
     </aside>
     <div class="workspace">
       <header class="topbar">
-        <div class="mobile-brand"><span class="mini-mark">↗</span><strong>ROAD TO 2:30</strong></div>
+        <div class="mobile-brand"><img class="brand-logo-img small" src="icon-192.png" alt="Sub 230"><strong>SUB 230</strong></div>
         <div class="top-caption">HALBMARATHON · 04.04.2027</div>
         <div class="top-right"><span class="pill small"><span class="pulse-dot"></span><span id="topSync">Lokal</span></span></div>
       </header>
       <main class="main" id="main">
         <section class="tab-page active" data-page="overview">
-          <div class="page-heading"><div><p class="eyebrow">DEIN PERSÖNLICHER LAUFCOACH</p><h1>Ein Lauf nach dem anderen<span class="accent">.</span></h1><p class="lead">Du musst Laufen nicht lieben. Du musst nur dranbleiben.</p></div><div class="header-actions"><button class="btn outline" id="syncNow">↻ Daten abrufen</button><button class="btn primary" data-show="coach">✦ Coach fragen</button></div></div>
+          <div class="page-heading"><div><p class="eyebrow">DEIN PERSÖNLICHER LAUFCOACH</p><h1>Ein Lauf nach dem anderen<span class="accent">.</span></h1><p class="lead">Du musst Laufen nicht lieben. Du musst nur dranbleiben.</p></div><div class="header-actions"><button class="btn outline" id="syncNow">↻ Daten abrufen</button><button class="btn primary" data-show="plan">↗ Nächstes Training</button></div></div>
           <div class="hero-grid">
             <div class="goal-card card"><span class="eyebrow light">DEIN ZIEL</span><div class="goal-number">2<span class="colon">:</span>29<span class="colon">:</span>59</div><div class="hero-row"><span>21,1 km · Halbmarathon</span><span class="hero-tag">7:06 min/km</span></div><div class="hero-bottom"><div><small>Wettkampf</small><strong id="raceText">04.04.2027</strong></div><div><small>Aktueller Schwerpunkt</small><strong id="phaseText">Grundlage aufbauen</strong></div></div></div>
-            <div class="coach-snapshot card"><div class="card-head"><div><p class="eyebrow">COACHING-FOKUS</p><h2>Konstanz vor Tempo</h2></div><div class="round-icon">✦</div></div><p id="coachStatus">Die Grundlage ist noch nicht messbar. Deine zwei lockeren Läufe pro Woche sind jetzt das Wichtigste.</p><div class="insight-footer"><div class="insight-dot">i</div>Sub 2:30 ist ein Ziel, noch keine berechnete Prognose.</div></div>
+            <div class="coach-snapshot card next-workout-card"><div class="card-head"><div><p class="eyebrow">NÄCHSTES TRAINING</p><h2 id="nextWorkoutTitle">Lauf 1 · Locker</h2></div><div class="round-icon">↗</div></div><p id="nextWorkoutDate">Dienstag · 4,0 km</p><div class="next-workout-stats"><span id="nextWorkoutPace" class="hero-tag">7:15–8:15 min/km</span><span id="nextWorkoutZone" class="hero-tag alt">Zone 2</span></div><p id="nextWorkoutHint" class="compact-note">Ganz locker bleiben und auf gleichmäßige Atmung achten.</p><div class="insight-footer"><div class="insight-dot">i</div><span id="nextWorkoutFooter">Tippe auf „Trainingsplan“, wenn du die komplette Einheit sehen oder anpassen willst.</span></div></div>
           </div>
           <div class="stat-grid">
             <div class="card stat"><span class="stat-title">Läufe diese Woche</span><div><strong id="statRuns">0 / 2</strong><span class="stat-icon">◷</span></div><small id="statRunsSub">Die Woche hat gerade begonnen</small></div>
@@ -99,30 +99,29 @@
                 <label>Bezeichnung<input id="editTitle" maxlength="80" required></label>
                 <label>Distanz in km<input id="editDistance" type="number" step="0.1" min="0.5" max="22" required></label>
                 <label>Pulszone<select id="editZone"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
-                <label>Langsame Pace-Grenze (min/km)<input id="editPaceFrom" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="7:30" required></label>
-                <label>Lockere Pace-Grenze (min/km)<input id="editPaceTo" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="8:30" required></label>
+                <label>Schnellere Pace-Grenze (min/km)<input id="editPaceFrom" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="7:30" required></label>
+                <label>Langsamere Pace-Grenze (min/km)<input id="editPaceTo" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="8:30" required></label>
                 <label class="full">Belastung / RPE<input id="editRpe" maxlength="50" placeholder="2–4 / 10"></label>
                 <label class="full">Ablauf<textarea id="editStructure" rows="3" maxlength="600" required></textarea></label>
                 <label class="full">Begründung / Hinweis<textarea id="editReason" rows="2" maxlength="400"></textarea></label>
                 <div class="full actions"><button class="btn primary" type="submit">Änderung speichern</button></div>
               </form>
             </div>
-            <div class="soft-note">Bearbeitete Einheiten sind lokal gespeichert. Der Halbmarathon am 04.04.2027 bleibt als Wettkampftermin gesperrt. Erst ein Backup sichert die Änderungen außerhalb dieses Browsers.</div>
-            <div class="soft-note" id="planSafetyNote">Aufwärmen, Pausen und Regeneration gehören zum Training. Bei Schmerzen, Infekt oder ungewöhnlicher Erschöpfung reduzieren oder aussetzen.</div>
+            <div class="soft-note compact" id="planSafetyNote">Änderungen bleiben lokal gespeichert.</div>
           </div>
           <div class="card section-card" id="coachImportCard">
             <div class="card-head"><div><p class="eyebrow">VOM COACH ÜBERNEHMEN</p><h2>Trainingsempfehlung importieren</h2></div><span class="pill" id="planChangesCount">0 Änderungen</span></div>
-            <p class="muted">Kopiere den <strong>ROAD230_UPDATE</strong>-Block aus deinem Coaching-Chat. Prüfe erst die Vorschau und bestätige danach die Änderungen. Es wird nichts automatisch überschrieben.</p>
+            <p class="muted">Füge hier nur bei Bedarf einen <strong>ROAD230_UPDATE</strong>-Block aus deinem Coaching-Chat ein und bestätige danach die Vorschau.</p>
             <label for="importText">Coaching-Block hier einfügen<textarea id="importText" rows="6" spellcheck="false" placeholder='ROAD230_UPDATE
 {"version":1,"workouts":[{"date":"2026-10-22","distanceKm":4,"paceFrom":"7:30","paceTo":"8:30","zone":2,"title":"Längerer Lauf","structure":"4 km locker laufen","reason":"Angepasste Belastung"}]}
 END_ROAD230_UPDATE'></textarea></label>
             <div class="actions"><button class="btn outline" id="checkImport">Änderungen prüfen</button><button class="btn primary" disabled id="applyImport">Geprüfte Änderungen übernehmen</button></div>
             <div id="importPreview" class="import-preview" aria-live="polite"></div>
-            <p class="hint">Akzeptiert nur gültige Trainingstermine, 0,5–22 km, eine plausible Pace und Garmin-Zone 1–5. Der Wettkampftag kann nicht überschrieben werden.</p>
+            
           </div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">VORAUSSCHAU</p><h2>Die nächsten Trainingswochen</h2></div></div><div class="training-horizon" id="trainingHorizon"></div><p class="hint">Die Kilometer sind Planwerte, keine absoluten Vorgaben. Bei verpassten Wochen den Umfang nicht nachholen; lieber die letzte gut verträgliche Woche wiederholen.</p></div>
+          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">VORAUSSCHAU</p><h2>Die nächsten Trainingswochen</h2></div></div><div class="training-horizon" id="trainingHorizon"></div></div>
           <div class="card section-card"><div class="card-head"><div><p class="eyebrow">LANGFRISTIG</p><h2>Deine Meilensteine</h2></div></div><div id="roadmap"></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DRANBLEIBEN</p><h2>Kalendererinnerungen · Dienstag und Donnerstag</h2></div></div><p class="muted">Wähle deine Trainingstage und Uhrzeiten. Wir erstellen zwei wiederkehrende Kalendereinträge mit Erinnerungen 30 Minuten vorher. Diese laufen ohne Server oder Monatsabo.</p><div class="reminder-grid"><label>Lockerer Lauf<select id="easyDay"><option value="1">Montag</option><option value="2" selected>Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="easyTime" value="18:00"></label><label>Langer Lauf<select id="longDay"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4" selected>Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="longTime" value="18:00"></label></div><button class="btn primary" id="downloadReminders">↓ Kalendererinnerungen erstellen</button><p class="hint">Nach dem Import die Hinweise deines iPhone-Kalenders beachten. Kalendereinträge sind unabhängig von Push-Nachrichten dieser Web-App.</p></div>
+          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DRANBLEIBEN</p><h2>Kalendererinnerungen · Dienstag und Donnerstag</h2></div></div><p class="muted">Wähle deine Trainingstage und Uhrzeiten. Die App erstellt zwei wiederkehrende Kalendereinträge mit Erinnerung 30 Minuten vorher.</p><div class="reminder-grid"><label>Lockerer Lauf<select id="easyDay"><option value="1">Montag</option><option value="2" selected>Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="easyTime" value="18:00"></label><label>Langer Lauf<select id="longDay"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4" selected>Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="longTime" value="18:00"></label></div><button class="btn primary" id="downloadReminders">↓ Kalendererinnerungen erstellen</button></div>
         </section>
         <section class="tab-page" data-page="progress">
           <div class="page-heading"><div><p class="eyebrow">DEIN TRAINING</p><h1>Fortschritt statt Perfektion<span class="accent">.</span></h1><p class="lead">Hier erscheinen die Läufe aus Intervals.icu oder deine manuellen Einträge.</p></div><button class="btn primary" id="addRunTop">+ Lauf eintragen</button></div>
@@ -147,11 +146,11 @@ END_ROAD230_UPDATE'></textarea></label>
           <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEINE DATEN</p><h2>Sichern und verwalten</h2></div></div><p class="muted">Läufe, Coaching-Notizen und individuelle Trainingsplan-Änderungen bleiben in diesem Browser gespeichert. Für iPhone und Laptop separat importieren und regelmäßig ein Backup sichern. Kein automatischer Abgleich zwischen Geräten.</p><div class="actions"><button class="btn outline" id="backupData">↓ JSON-Backup erstellen</button><label class="btn outline file-button">↑ Backup importieren<input type="file" id="restoreFile" accept="application/json,.json" hidden></label><button class="btn dangerous" id="resetData">Lokale Daten löschen</button></div><p class="hint">Auf GitHub Pages liegt nur der Programmcode. Bitte niemals deinen API-Schlüssel in Dateien oder GitHub hochladen.</p></div>
         </section>
       </main>
-      <footer class="footer">ROAD TO 2:30 · Version 5 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
+      <footer class="footer">SUB 230 · Version 6 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
     </div>
   </div>
   <nav class="bottom-nav" aria-label="Mobile Navigation"><button data-tab="overview" class="active"><span>◫</span><small>Home</small></button><button data-tab="plan"><span>▦</span><small>Plan</small></button><button data-tab="progress"><span>↗</span><small>Training</small></button><button data-tab="coach"><span>✦</span><small>Coach</small></button><button data-tab="settings"><span>⚙</span><small>Mehr</small></button></nav>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=5" defer></script>
+  <script src="app.js?v=6" defer></script>
 </body>
 </html>

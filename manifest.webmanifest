@@ -1,7 +1,7 @@
 {
-  "name": "Road to 2:30 – Mein Halbmarathon-Cockpit",
-  "short_name": "Road 2:30",
-  "description": "Garmin-Läufe, Trainingsplan und KI-Coach ohne Abo",
+  "name": "Sub 230 – Mein Halbmarathon-Cockpit",
+  "short_name": "Sub 230",
+  "description": "Garmin-Läufe, Trainingsplan und Coaching-Zusammenfassung ohne Abo",
   "lang": "de-AT",
   "start_url": "./",
   "scope": "./",
@@ -9,7 +9,17 @@
   "background_color": "#0a1320",
   "theme_color": "#0c1726",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

@@ -1,62 +1,67 @@
-# Road to 2:30 – dein kostenloses iPhone-Halbmarathon-Cockpit
+# Sub 230 – Version 6
 
-Ein kleiner, direkt benutzbarer PWA-Prototyp für **Sub 2:30 im April 2027**, zwei Laufeinheiten pro Woche und Garmin-basierte Laufdaten. Die App braucht **keinen eigenen Server, keine Datenbank und keine OpenAI-API**. Es gibt keine laufenden Pflichtkosten für die bereitgestellte Version.
+Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. April 2027**. Kein neuer App-Account und kein KI-API-Abonnement erforderlich.
 
-## 1. Sofort ansehen
+## Neu in V5
 
-`index.html` in einem Desktop-Browser öffnen. Ohne Einrichtung funktionieren Trainingsplan, Roadmap, manuelles Lauftagebuch, Auswertung und der Copy-to-ChatGPT-Knopf. Die Garmin-Verbindung und iPhone-Installation funktionieren zuverlässiger, wenn die App über HTTPS gehostet wird (s.u.).
+- **Jede Trainingseinheit bearbeiten:** Distanz, Pace-Bereich (mm:ss), Garmin-Pulszone, Belastung und Ablauf; Original jederzeit wiederherstellen.
+- **Coaching-Anpassungen importieren:** Einen `ROAD230_UPDATE`-Block aus dem separaten Coaching-Chat einfügen, Vorher/Nachher ansehen und Änderungen ausdrücklich bestätigen. Nie automatische Schreibzugriffe auf den Trainingsplan.
+- **Echte Trainingstermine:** Dienstag und Donnerstag sind die Vorgaben, Änderungen an Wochentagen/Uhrzeiten werden sofort lokal gespeichert. Rennen fix am Sonntag, 04.04.2027.
+- **Trainingskontinuität:** Zwei Läufe/Woche, 4-Wochen-Übersicht ohne Straf-Streaks.
+- **Puls-Pace-Vergleich:** Nur vergleichbare Läufe mit ähnlichem Puls und Distanz.
+- **Vorsichtige Wettkampf-Einschätzung:** Eine grobe Zeitspanne erst nach mehreren Wochen mit ausreichend Läufen, mindestens einem langen Lauf und einem ausdrücklich markierten, anstrengenden 10-km-Test. Keine medizinische oder sportdiagnostische Aussage.
+- **Feedback:** RPE, Notizen und optionale Markierungen für Warnzeichen bzw. 10-km-Test.
+- **Privater Coaching-Kontext:** Freie Angaben nur lokal speichern; nicht mehr fest im öffentlichen JavaScript.
+- **Backups:** Planänderungen und Coaching-Kontext werden mitgesichert. API-Schlüssel **nicht** im Backup enthalten.
 
-## 2. Kostenlos dauerhaft aufs iPhone bringen
+## Vor dem Update: Datensicherung
 
-1. Kostenloses GitHub-Konto nutzen bzw. erstellen: https://github.com/
-2. Neues **öffentliches** Repository erstellen, z.B. `road-to-230`. (Die Programmdateien enthalten keine persönlichen Zugangsdaten.)
-3. Alle Dateien aus diesem Ordner in das Repository hochladen, **nicht den ZIP-Ordner als ZIP-Datei**.
-4. Unter **Settings → Pages** die Veröffentlichung über **Deploy from a branch**, Branch `main`, Folder `/(root)` aktivieren.
-5. Die auf GitHub Pages angezeigte HTTPS-Adresse in Safari auf dem iPhone öffnen.
-6. **Teilen → Zum Home-Bildschirm → Als Web-App öffnen** aktivieren.
+1. Öffne die bisherige App unter https://seppl230.github.io/Sub-230/.
+2. Unter **Einstellungen → JSON-Backup erstellen** eine Sicherung herunterladen. **Nicht auf GitHub hochladen!** Das Backup enthält Trainingsdaten und Notizen.
+3. Entpacke `road-to-230-update-v5.zip`.
+4. In https://github.com/seppl230/Sub-230 unter **Add file → Upload files** die vier Dateien `index.html`, `app.js`, `styles.css`, `sw.js` hochladen und die vorhandenen Versionen überschreiben.
+5. **Commit changes**, in **Actions** das Pages-Deployment abwarten, anschließend die App hart neu laden (Windows: **Strg+F5**, iPhone: App schließen und neu öffnen). Unten muss **Version 6** stehen.
 
-**Wichtig:** GitHub Pages ist öffentlich. Keine privaten Laufdaten oder API-Schlüssel in GitHub-Dateien eintragen. Schlüssel werden erst in den Einstellungen auf dem eigenen Gerät eingegeben.
+Die App nutzt denselben lokalen Speicher wie V4. Intervals.icu-Schlüssel, vorhandene Läufe und deine bereits eingestellten Wochentage sollten im gleichen Browser erhalten bleiben. Der Schlüssel bleibt jeweils an den ursprünglichen Browser gebunden.
 
-## 3. Garmin verbinden (zunächst testen)
+## Neue Funktionen nutzen
 
-1. Auf https://intervals.icu/ ein Konto erstellen. Garmin Connect in Intervals.icu unter Einstellungen verbinden.
-2. Unter **Intervals.icu → Settings → Developer Settings** einen persönlichen API-Schlüssel erstellen.
-3. Nur im Einstellungsbildschirm der installierten Road-to-2:30-App einfügen. **Niemals hier im Chat, in GitHub oder in öffentlichen Dateien teilen.**
-4. **Verbindung testen und synchronisieren** antippen. Die App ruft die offizielle `https://intervals.icu/api/v1/athlete/0/activities`-Schnittstelle ab. Bei gespeichertem Schlüssel synchronisiert sie beim Öffnen.
+**Einheit manuell ändern:** Trainingsplan → gewünschte Woche → „Training bearbeiten“ → Werte ändern → Speichern. Mit „Original wiederherstellen“ werden Änderungen dieser Einheit rückgängig gemacht.
 
-**Achtung (Stand Oktober 2026):** Garmin und Intervals.icu besprechen Beschränkungen bei der Weitergabe von Garmin-Daten über Drittanbieter-APIs. Es kann sein, dass Daten in der App nicht abrufbar sind. Das Dashboard funktioniert auch mit manuellen Läufen. Die Verfügbarkeit kann sich ändern.
+**Coach-Änderungen übernehmen:** Nach dem Lauf Coaching-Bericht in ChatGPT einfügen. Bitte den Coach, bei erforderlichen Änderungen einen strukturierten Block auszugeben. Kopiere **nur** den Block ab `ROAD230_UPDATE` bis `END_ROAD230_UPDATE` in **Trainingsplan → Trainingsempfehlung importieren**. Auf **Änderungen prüfen** tippen, Werte kontrollieren und **Geprüfte Änderungen übernehmen** bestätigen.
 
-**Datenschutz:** Nur HTTPS-Verbindungen zur Intervals.icu-API; keine Weiterleitung des Schlüssels an einen eigenen Server. Mit der Checkbox „Schlüssel auf diesem Gerät speichern“ wird der Schlüssel unverschlüsselt im lokalen Browser-Speicher gespeichert (bequem, aber bei kompromittiertem Gerät riskanter). Ohne Checkbox wird er nur für die aktuelle Browser-Sitzung gespeichert. In beiden Fällen darf das Gerät nicht von Fremden benutzt werden. Über „Schlüssel entfernen“ lässt sich der Schlüssel aus der App löschen. Bereits synchronisierte Daten verbleiben bis zum Zurücksetzen im lokalen Browser.
+Beispiel **nur zur Erklärung**, nicht ungeprüft als Trainingsvorgabe übernehmen:
 
-## 4. Mit ChatGPT trainieren
+```
+ROAD230_UPDATE
+{
+  "version": 1,
+  "workouts": [
+    {
+      "date": "2026-10-22",
+      "title": "Längerer Lauf",
+      "distanceKm": 4,
+      "paceFrom": "7:30",
+      "paceTo": "8:30",
+      "zone": 2,
+      "structure": "5 Minuten einlaufen, 4 km locker, 5 Minuten ausgehen.",
+      "reason": "Belastung kontrolliert halten."
+    }
+  ]
+}
+END_ROAD230_UPDATE
+```
 
-1. Unter „Training“ bei einer Aktivität auf **„Wie war es? Feedback geben“** tippen und dein Belastungsempfinden sowie eine kurze Notiz speichern.
-2. Danach auf „KI-Coach“ tippen.
-3. „Zusammenfassung kopieren“ auswählen.
-4. „ChatGPT öffnen“ tippen, dort **unseren bestehenden Halbmarathon-Chat** öffnen und den Text einfügen.
-5. So bekommst du personalisiertes Feedback **ohne separate OpenAI-API-Rechnung**.
+Das Datum **muss** einem tatsächlichen Trainingstermin im aktuellen Plan entsprechen, andernfalls wird der Import abgelehnt. Das Wettkampfdatum ist für Änderungen gesperrt. Der Import ersetzt nur die konkret aufgeführten Einheiten.
 
-Das ist kein eingebetteter Chat und keine automatische KI-Auswertung. Für Letzteres wären eine andere technische Lösung und ggf. eigene API-Kosten notwendig.
+**Einträge auf iPhone übertragen:** Unter Einstellungen Backup exportieren, Datei privat auf das andere Gerät übertragen und dort **Backup importieren**. Das überschreibt dessen lokale Daten und ersetzt **keine** Geräte-Synchronisation. Vor einem Import immer auch auf dem Zielgerät sichern.
 
-## 5. Erinnerungen
+## Sicherheit und Grenzen
 
-Unter „Trainingsplan“ Wochentage/Uhrzeiten wählen und **Kalendererinnerungen erstellen**. Eine `.ics`-Datei mit wiederkehrenden Kalendereinträgen bis Ende April 2027 wird erzeugt, jeweils mit 30-minütigem Alarm. Diese Datei im iPhone-Kalender importieren. Manche iPhone-Konfigurationen erfordern Import über die Dateien-App oder Mail. Der Plan im Dashboard lässt sich momentan unabhängig davon nicht automatisch in bestehende Kalendereinträge zurückschreiben.
-
-## 6. Einschränkungen und nächste sinnvolle Verbesserungen
-
-- Garmin-Daten nur bei geöffnetem Dashboard abrufen; kein Hintergrundsync und keine Push-Auswertung nach jedem Lauf.
-- Garmin-API-Zugriff über Drittanbieter kann derzeit eingeschränkt werden.
-- Keine automatische Wettkampfzeitvorhersage auf Basis weniger Trainingsdaten; die Roadmap zeigt **Richtwerte**, nicht medizinisch validierte Empfehlungen.
-- Der langfristige Plan ist ein Startvorschlag; je nach Eis-Schiedsrichtereinsätzen, Trainingserholung und genauem April-Wettkampftag anpassen.
-- Laufdaten und manuelle Kommentare verbleiben lokal im Browser (lokaler Speicher). **JSON-Backups regelmäßig erstellen** – beim Leeren von Safari-Websitedaten können die Einträge verschwinden.
-- Diese Version ist privat gedacht. Eine Multi-User-App benötigt andere Authentifizierung und Infrastruktur.
-
-## Dateiliste
-
-- `index.html` – App-Oberfläche
-- `styles.css` – mobiles Design
-- `app.js` – Trainingstagebuch, Garmin-Abfrage, Coach-Export, Erinnerungen
-- `sw.js` – Offline-Verfügbarkeit der App-Shell
-- `manifest.webmanifest`, `icon-*.png` – Installation als iPhone-Web-App
-
-Kein Build, keine Installation von Paketen, keine Tracking- oder Analyse-Skripte erforderlich.
+- Das GitHub-Pages-Repository ist öffentlich. Besucher sehen den Programmcode, aber nicht automatisch Daten in deinem privaten Browser-Speicher.
+- **Ältere GitHub-Commits bleiben öffentlich abrufbar.** In früheren Versionen fest hinterlegte biografische Angaben verschwinden durch das Update **nicht** aus der Git-Historie. Falls du diese vollständig aus dem öffentlichen Repository entfernen möchtest, ist ein sauberer Neustart des Repositories ohne alte Commits einfacher als nur Dateien zu überschreiben.
+- Ein dauerhaft gespeicherter API-Schlüssel liegt im lokalen Browser-Speicher und ist dort **nicht verschlüsselt**. Nutze für fremde Geräte lieber den Sitzungsmodus und entferne den Schlüssel danach. Den Schlüssel niemals in GitHub, ChatGPT oder Fotos posten.
+- Bei problematischem oder eingeschränktem Garmin-/Intervals.icu-Zugriff funktionieren manuelle Lauf-Einträge weiterhin.
+- Die App synchronisiert Garmin-Daten bei deinem Klick bzw. beim Öffnen, wenn ein gespeicherter Schlüssel vorhanden ist; kein Hintergrundserver.
+- Der Chat läuft weiterhin **separat** in ChatGPT; das Training wird nicht heimlich durch ChatGPT geändert.
+- Die gezeigten Trainingsempfehlungen sind kein Ersatz für medizinische Beratung. Bei Schmerzen, Infekt oder anhaltend ungewöhnlicher Erschöpfung reduziere die Belastung bzw. hole ärztlichen Rat ein.
