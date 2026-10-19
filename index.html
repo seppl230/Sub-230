@@ -10,15 +10,15 @@
   <meta name="description" content="Dein kostenloses Halbmarathon-Cockpit: Garmin-Import, Trainingsplan und Coaching-Zusammenfassung.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://intervals.icu; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" href="icon-192-v62.png">
-  <link rel="apple-touch-icon" href="icon-192-v62.png">
-  <link rel="stylesheet" href="styles.css?v=6.2">
+  <link rel="icon" type="image/png" href="icon-192-v63.png">
+  <link rel="apple-touch-icon" href="icon-192-v63.png">
+  <link rel="stylesheet" href="styles.css?v=6.3">
   <title>Sub 230 | Dein Halbmarathon-Cockpit</title>
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand"><img class="brand-logo-img" src="icon-192-v62.png" alt="Sub 230"><div><strong>SUB 230</strong><small>Dein Lauf-Cockpit</small></div></div>
+      <div class="brand"><img class="brand-logo-img" src="header-mark-192-v63.png" alt="Sub 230"><div><strong>SUB 230</strong><small>Dein Lauf-Cockpit</small></div></div>
       <div class="side-head">MENÜ</div>
       <nav class="desktop-nav" aria-label="Navigation">
         <button class="nav-btn active" data-tab="overview"><span>◫</span> Übersicht</button>
@@ -31,7 +31,7 @@
     </aside>
     <div class="workspace">
       <header class="topbar">
-        <div class="mobile-brand"><img class="brand-logo-img small" src="icon-192-v62.png" alt="Sub 230"><strong>SUB 230</strong></div>
+        <div class="mobile-brand"><img class="brand-logo-img small" src="header-mark-192-v63.png" alt="Sub 230"><strong>SUB 230</strong></div>
         <div class="top-caption">HALBMARATHON · 04.04.2027</div>
         <div class="top-right"><span class="pill small"><span class="pulse-dot"></span><span id="topSync">Lokal</span></span></div>
       </header>
@@ -146,11 +146,11 @@ END_ROAD230_UPDATE'></textarea></label>
           <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEINE DATEN</p><h2>Sichern und verwalten</h2></div></div><p class="muted">Läufe, Coaching-Notizen und individuelle Trainingsplan-Änderungen bleiben in diesem Browser gespeichert. Für iPhone und Laptop separat importieren und regelmäßig ein Backup sichern. Kein automatischer Abgleich zwischen Geräten.</p><div class="actions"><button class="btn outline" id="backupData">↓ JSON-Backup erstellen</button><label class="btn outline file-button">↑ Backup importieren<input type="file" id="restoreFile" accept="application/json,.json" hidden></label><button class="btn dangerous" id="resetData">Lokale Daten löschen</button></div><p class="hint">Auf GitHub Pages liegt nur der Programmcode. Bitte niemals deinen API-Schlüssel in Dateien oder GitHub hochladen.</p></div>
         </section>
       </main>
-      <footer class="footer">SUB 230 · Version 6.2 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
+      <footer class="footer">SUB 230 · Version 6.3 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
     </div>
   </div>
   <nav class="bottom-nav" aria-label="Mobile Navigation"><button data-tab="overview" class="active"><span>◫</span><small>Home</small></button><button data-tab="plan"><span>▦</span><small>Plan</small></button><button data-tab="progress"><span>↗</span><small>Training</small></button><button data-tab="coach"><span>✦</span><small>Coach</small></button><button data-tab="settings"><span>⚙</span><small>Mehr</small></button></nav>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=6.2" defer></script>
+  <script src="app.js?v=6.3" defer></script>
 </body>
 </html>

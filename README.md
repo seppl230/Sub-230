@@ -1,4 +1,4 @@
-# Sub 230 – Version 6.2
+# Sub 230 – Version 6.3
 
 Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. April 2027**. Kein neuer App-Account und kein KI-API-Abonnement erforderlich.
 
@@ -20,7 +20,7 @@ Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. Apr
 2. Unter **Einstellungen → JSON-Backup erstellen** eine Sicherung herunterladen. **Nicht auf GitHub hochladen!** Das Backup enthält Trainingsdaten und Notizen.
 3. Entpacke `road-to-230-update-v5.zip`.
 4. In https://github.com/seppl230/Sub-230 unter **Add file → Upload files** die vier Dateien `index.html`, `app.js`, `styles.css`, `sw.js` hochladen und die vorhandenen Versionen überschreiben.
-5. **Commit changes**, in **Actions** das Pages-Deployment abwarten, anschließend die App hart neu laden (Windows: **Strg+F5**, iPhone: App schließen und neu öffnen). Unten muss **Version 6.2** stehen.
+5. **Commit changes**, in **Actions** das Pages-Deployment abwarten, anschließend die App hart neu laden (Windows: **Strg+F5**, iPhone: App schließen und neu öffnen). Unten muss **Version 6.3** stehen.
 
 Die App nutzt denselben lokalen Speicher wie V4. Intervals.icu-Schlüssel, vorhandene Läufe und deine bereits eingestellten Wochentage sollten im gleichen Browser erhalten bleiben. Der Schlüssel bleibt jeweils an den ursprünglichen Browser gebunden.
 
@@ -65,3 +65,7 @@ Das Datum **muss** einem tatsächlichen Trainingstermin im aktuellen Plan entspr
 - Die App synchronisiert Garmin-Daten bei deinem Klick bzw. beim Öffnen, wenn ein gespeicherter Schlüssel vorhanden ist; kein Hintergrundserver.
 - Der Chat läuft weiterhin **separat** in ChatGPT; das Training wird nicht heimlich durch ChatGPT geändert.
 - Die gezeigten Trainingsempfehlungen sind kein Ersatz für medizinische Beratung. Bei Schmerzen, Infekt oder anhaltend ungewöhnlicher Erschöpfung reduziere die Belastung bzw. hole ärztlichen Rat ein.
+
+
+## V6.3 – Icon-Korrektur
+Das ausgewählte 2:30-Stoppuhr-Icon wurde aus der Original-Vorlage freigestellt. Die weißen Bereiche sind transparent. Keine weiteren Änderungen am Design oder an der Trainingslogik.
