@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3">
   <title>Road to 2:30 | Dein Halbmarathon-Cockpit</title>
 </head>
 <body>
@@ -69,7 +69,37 @@
         </section>
         <section class="tab-page" data-page="plan">
           <div class="page-heading"><div><p class="eyebrow">DEINE ROADMAP</p><h1>Das wird dein Weg<span class="accent">.</span></h1><p class="lead">Zwei Läufe pro Woche, angepasst an Eishockey und Erholung. Keine Pflicht, Schmerzen wegzutrainieren.</p></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">AKTUELLE TRAININGSWOCHE</p><h2 id="planWeekTitle">Woche 1</h2></div><span class="pill" id="planWeekDates"></span></div><div id="planSessions"></div><div class="soft-note">Die Distanzen sind Richtwerte. Lauf locker im Gesprächstempo und reduziere die Belastung bei Schmerzen, Krankheit oder starken Schiri-Wochenenden.</div></div>
+          <div class="plan-intro-grid">
+            <div class="card section-card plan-summary-card">
+              <p class="eyebrow">SO TRAINIERST DU</p><h2>Konkrete Vorgaben, ohne Tempodruck</h2>
+              <div class="pace-guide-grid">
+                <div><span>Lockerer Lauf</span><strong>ca. 7:15–8:15 /km</strong><small>RPE 2–4 / 10 · ganze Sätze möglich</small></div>
+                <div><span>Langer Lauf</span><strong>ca. 7:25–8:40 /km</strong><small>RPE 2–4 / 10 · bei Bedarf Gehpausen</small></div>
+                <div><span>Halbmarathon-Ziel</span><strong>7:06 /km</strong><small>Wettkampfpace, NICHT die Pace für lockere Läufe</small></div>
+              </div>
+              <p class="hint">Diese Pace-Spannen sind vorläufige Orientierung aus deinem einzigen bekannten 4-km-Lauf. Bei Widerspruch haben Gesprächstest, Atmung und Belastungsgefühl Vorrang. Nicht auf Biegen und Brechen in der Spanne bleiben.</p>
+            </div>
+            <div class="card section-card plan-zones-card">
+              <div class="card-head"><div><p class="eyebrow">DEINE GARMIN-ZONEN</p><h2>Pulsbereiche einrichten</h2></div><span class="pill" id="zoneStatus">Noch offen</span></div>
+              <p class="muted">Übertrage die <strong>Lauf-Pulszonen</strong> aus Garmin Connect. Die App erfindet keine bpm-Werte aus deinem Alter.</p>
+              <form id="hrZonesForm" class="zone-form">
+                <label>Zone 2 von (bpm)<input id="zone2Low" type="number" min="40" max="230" inputmode="numeric" placeholder="z. B. Garmin-Wert"></label>
+                <label>Zone 2 bis (bpm)<input id="zone2High" type="number" min="40" max="230" inputmode="numeric" placeholder="z. B. Garmin-Wert"></label>
+                <label>Zone 3 von (optional)<input id="zone3Low" type="number" min="40" max="230" inputmode="numeric" placeholder="Optional"></label>
+                <label>Zone 3 bis (optional)<input id="zone3High" type="number" min="40" max="230" inputmode="numeric" placeholder="Optional"></label>
+                <button type="submit" class="btn primary zone-save">Pulszonen speichern</button>
+              </form>
+              <p class="hint">Bei neu eingerichteten Garmin-Zonen können die Grenzwerte nur geschätzt sein. RPE und Gesprächstest gehen vor. Auf Wunsch später mit echten Laufdaten verfeinern.</p>
+            </div>
+          </div>
+          <div class="card section-card detailed-plan">
+            <div class="card-head plan-nav-heading"><div><p class="eyebrow">TRAININGSEINHEITEN</p><h2 id="planWeekTitle">Woche 1</h2></div><div class="plan-picker"><label for="weekPicker">Woche ansehen<select id="weekPicker"></select></label><span class="pill" id="planWeekDates"></span></div></div>
+            <div class="week-meta" id="weekMeta"></div>
+            <div id="planSessions" class="session-details"></div>
+            <div class="recovery-control"><label class="checkbox-row"><input type="checkbox" id="intenseWeekend"><span><strong>Intensives Schiri-Wochenende</strong> – diese Woche den langen Lauf bei Müdigkeit um etwa 20 % verkürzen und keine schnelleren Abschnitte.</span></label></div>
+            <div class="soft-note" id="planSafetyNote">Aufwärmen, Pausen und Regeneration gehören zum Training. Bei Schmerzen, Infekt oder ungewöhnlicher Erschöpfung reduzieren oder aussetzen.</div>
+          </div>
+          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">VORAUSSCHAU</p><h2>Die nächsten Trainingswochen</h2></div></div><div class="training-horizon" id="trainingHorizon"></div><p class="hint">Die Kilometer sind Planwerte, keine absoluten Vorgaben. Bei verpassten Wochen den Umfang nicht nachholen; lieber die letzte gut verträgliche Woche wiederholen.</p></div>
           <div class="card section-card"><div class="card-head"><div><p class="eyebrow">LANGFRISTIG</p><h2>Deine Meilensteine</h2></div></div><div id="roadmap"></div></div>
           <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DRANBLEIBEN</p><h2>Kalendererinnerungen</h2></div></div><p class="muted">Wähle deine Trainingstage und Uhrzeiten. Wir erstellen zwei wiederkehrende Kalendereinträge mit Erinnerungen 30 Minuten vorher. Diese laufen ohne Server oder Monatsabo.</p><div class="reminder-grid"><label>Lockerer Lauf<select id="easyDay"><option value="1">Montag</option><option value="2" selected>Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="easyTime" value="18:00"></label><label>Langer Lauf<select id="longDay"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5" selected>Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="longTime" value="17:00"></label></div><button class="btn primary" id="downloadReminders">↓ Kalendererinnerungen erstellen</button><p class="hint">Nach dem Import die Hinweise deines iPhone-Kalenders beachten. Kalendereinträge sind unabhängig von Push-Nachrichten dieser Web-App.</p></div>
         </section>
@@ -93,11 +123,11 @@
           <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEINE DATEN</p><h2>Sichern und verwalten</h2></div></div><p class="muted">Trainingsdaten und persönliche Notizen werden nur in diesem Browser gespeichert. Bei einem Gerätewechsel bitte vorher exportieren.</p><div class="actions"><button class="btn outline" id="backupData">↓ JSON-Backup erstellen</button><label class="btn outline file-button">↑ Backup importieren<input type="file" id="restoreFile" accept="application/json,.json" hidden></label><button class="btn dangerous" id="resetData">Lokale Daten löschen</button></div><p class="hint">Auf GitHub Pages liegt nur der Programmcode. Bitte niemals deinen API-Schlüssel in Dateien oder GitHub hochladen.</p></div>
         </section>
       </main>
-      <footer class="footer">ROAD TO 2:30 · Version 2 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
+      <footer class="footer">ROAD TO 2:30 · Version 3 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
     </div>
   </div>
   <nav class="bottom-nav" aria-label="Mobile Navigation"><button data-tab="overview" class="active"><span>◫</span><small>Home</small></button><button data-tab="plan"><span>▦</span><small>Plan</small></button><button data-tab="progress"><span>↗</span><small>Training</small></button><button data-tab="coach"><span>✦</span><small>Coach</small></button><button data-tab="settings"><span>⚙</span><small>Mehr</small></button></nav>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=3" defer></script>
 </body>
 </html>
