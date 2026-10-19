@@ -1,3 +1,13 @@
+# Sub 230 — V6.1 (Logo-Korrektur)
+
+Dieses Update korrigiert ausschließlich das App-Icon gemäß der gewählten Stoppuhr-Vorlage. Trainingsdaten, Garmin-Einstellungen, Planänderungen und übrige Funktionen bleiben unverändert.
+
+**Update installieren:** Aktuelles JSON-Backup in der App erstellen; anschließend den Inhalt der Update-ZIP (Dateien direkt im ZIP-Hauptverzeichnis) in das Root-Verzeichnis des GitHub-Repositories `Sub-230` hochladen, bestehende Dateien überschreiben und den GitHub Pages Build abwarten.
+
+**iPhone-Icon:** Ggf. die bisherige Home-Bildschirm-Verknüpfung entfernen und danach aus Safari über **Teilen → Zum Home-Bildschirm** neu hinzufügen, wenn weiterhin das alte Icon erscheint. Die privaten Laufdaten im lokalen Browser sollten nicht gelöscht werden; vorher ein Backup erstellen.
+
+---
+
 # Sub 230 – Version 6
 
 Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. April 2027**. Kein neuer App-Account und kein KI-API-Abonnement erforderlich.
