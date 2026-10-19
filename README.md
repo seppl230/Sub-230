@@ -1,14 +1,4 @@
-# Sub 230 — V6.1 (Logo-Korrektur)
-
-Dieses Update korrigiert ausschließlich das App-Icon gemäß der gewählten Stoppuhr-Vorlage. Trainingsdaten, Garmin-Einstellungen, Planänderungen und übrige Funktionen bleiben unverändert.
-
-**Update installieren:** Aktuelles JSON-Backup in der App erstellen; anschließend den Inhalt der Update-ZIP (Dateien direkt im ZIP-Hauptverzeichnis) in das Root-Verzeichnis des GitHub-Repositories `Sub-230` hochladen, bestehende Dateien überschreiben und den GitHub Pages Build abwarten.
-
-**iPhone-Icon:** Ggf. die bisherige Home-Bildschirm-Verknüpfung entfernen und danach aus Safari über **Teilen → Zum Home-Bildschirm** neu hinzufügen, wenn weiterhin das alte Icon erscheint. Die privaten Laufdaten im lokalen Browser sollten nicht gelöscht werden; vorher ein Backup erstellen.
-
----
-
-# Sub 230 – Version 6
+# Sub 230 – Version 6.2
 
 Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. April 2027**. Kein neuer App-Account und kein KI-API-Abonnement erforderlich.
 
@@ -30,7 +20,7 @@ Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. Apr
 2. Unter **Einstellungen → JSON-Backup erstellen** eine Sicherung herunterladen. **Nicht auf GitHub hochladen!** Das Backup enthält Trainingsdaten und Notizen.
 3. Entpacke `road-to-230-update-v5.zip`.
 4. In https://github.com/seppl230/Sub-230 unter **Add file → Upload files** die vier Dateien `index.html`, `app.js`, `styles.css`, `sw.js` hochladen und die vorhandenen Versionen überschreiben.
-5. **Commit changes**, in **Actions** das Pages-Deployment abwarten, anschließend die App hart neu laden (Windows: **Strg+F5**, iPhone: App schließen und neu öffnen). Unten muss **Version 6** stehen.
+5. **Commit changes**, in **Actions** das Pages-Deployment abwarten, anschließend die App hart neu laden (Windows: **Strg+F5**, iPhone: App schließen und neu öffnen). Unten muss **Version 6.2** stehen.
 
 Die App nutzt denselben lokalen Speicher wie V4. Intervals.icu-Schlüssel, vorhandene Läufe und deine bereits eingestellten Wochentage sollten im gleichen Browser erhalten bleiben. Der Schlüssel bleibt jeweils an den ursprünglichen Browser gebunden.
 
