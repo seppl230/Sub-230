@@ -18,14 +18,14 @@ const ROADMAP = [
   {name:'Mär 2027',target:'16–18 km',km:18,desc:'Spezifische Vorbereitung und 10-km-Test'},
   {name:'Apr 2027',target:'21,1 km',km:21.1,desc:'Vor dem Wettkampf reduzieren und erholt starten'}
 ];
-const DEFAULT = {manual:[],synced:[],notes:{},raceDate:RACE_DATE,reminders:{easyDay:2,easyTime:'18:00',longDay:4,longTime:'18:00'},feedback:{},training:{},planOverrides:{},changeLog:[],profile:{notes:''},lastSync:null,weights:[],dismissedFeedback:[],hrZoneSettings:null};
+const DEFAULT = {manual:[],synced:[],notes:{},raceDate:RACE_DATE,reminders:{easyDay:2,easyTime:'18:00',longDay:4,longTime:'18:00'},feedback:{},training:{},planOverrides:{},changeLog:[],profile:{notes:''},lastSync:null,weights:[],dismissedFeedback:[],hrZoneSettings:null,planRules:[]};
 let state = loadState();
 let toastTimer;
 let editingFeedbackId=null;
 let inspectedWeek=null;
 function feedbackFor(r){const f=state.feedback&&state.feedback[r.id];return {rpe:f&&f.rpe!=null?f.rpe:r.rpe,note:f&&typeof f.note==='string'?f.note:(r.note||''),test10k:!!f?.test10k,warning:!!f?.warning}}
 function el(id){return document.getElementById(id)}
-function loadState(){try{const data=JSON.parse(localStorage.getItem(STORE)||'{}');return {...DEFAULT,...data,manual:Array.isArray(data.manual)?data.manual:[],synced:Array.isArray(data.synced)?data.synced:[],notes:data.notes && typeof data.notes==='object'?data.notes:{},feedback:data.feedback && typeof data.feedback==='object'?data.feedback:{},reminders:{...DEFAULT.reminders,...(data.reminders||{})},training:{},planOverrides:data.planOverrides&&typeof data.planOverrides==='object'&&!Array.isArray(data.planOverrides)?data.planOverrides:{},changeLog:Array.isArray(data.changeLog)?data.changeLog.slice(-50):[],profile:{notes:typeof data.profile?.notes==='string'?data.profile.notes.slice(0,600):''},weights:Array.isArray(data.weights)?data.weights:[],dismissedFeedback:Array.isArray(data.dismissedFeedback)?data.dismissedFeedback:[],hrZoneSettings:data.hrZoneSettings||null}}catch{return {...DEFAULT}}}
+function loadState(){try{const data=JSON.parse(localStorage.getItem(STORE)||'{}');return {...DEFAULT,...data,manual:Array.isArray(data.manual)?data.manual:[],synced:Array.isArray(data.synced)?data.synced:[],notes:data.notes && typeof data.notes==='object'?data.notes:{},feedback:data.feedback && typeof data.feedback==='object'?data.feedback:{},reminders:{...DEFAULT.reminders,...(data.reminders||{})},training:{},planOverrides:data.planOverrides&&typeof data.planOverrides==='object'&&!Array.isArray(data.planOverrides)?data.planOverrides:{},changeLog:Array.isArray(data.changeLog)?data.changeLog.slice(-50):[],profile:{notes:typeof data.profile?.notes==='string'?data.profile.notes.slice(0,600):''},weights:Array.isArray(data.weights)?data.weights:[],dismissedFeedback:Array.isArray(data.dismissedFeedback)?data.dismissedFeedback:[],hrZoneSettings:data.hrZoneSettings||null,planRules:Array.isArray(data.planRules)?data.planRules.slice(-50):[]}}catch{return {...DEFAULT}}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch{toast('Lokaler Speicher nicht verfügbar. Bitte Daten exportieren.')}}
 function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3700)}
 function dateStr(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
@@ -72,6 +72,50 @@ function plannedDate(week,index){
   return dateStr(addDays(monday,(day+6)%7));
 }
 function workoutKey(week,index){return `${week}:${index}`}
+// Persistente Coach-Vorgaben wirken auf alle zukünftigen Trainings dieses Typs.
+// Bestehende Distanzen, Trainingstage und der Wettkampf bleiben unverändert.
+function activePlanRule(week,index){
+  if(week===PLAN.length-1&&index===1)return null;
+  const date=plannedDate(week,index),kind=index===0?'easy':'long';
+  const matches=(state.planRules||[]).filter(r=>r&&r.type===kind&&r.fromDate<=date);
+  matches.sort((a,b)=>a.fromDate.localeCompare(b.fromDate)||String(a.changedAt||'').localeCompare(String(b.changedAt||'')));
+  return matches.length?matches[matches.length-1]:null;
+}
+function firstUpcomingWorkoutDate(index){
+  const today=dateStr(new Date()),current=weekIdx();
+  for(let w=current;w<PLAN.length;w++){
+    if(w===PLAN.length-1&&index===1)break;
+    const d=plannedDate(w,index);
+    if(d<today)continue;
+    if(d===today&&sessionDoneFlags(w)[index])continue;
+    return d;
+  }
+  return null;
+}
+function futureRuleCount(type,fromDate){
+  let count=0;
+  for(let w=0;w<PLAN.length;w++)for(let i=0;i<2;i++){
+    if(w===PLAN.length-1&&i===1)continue;
+    if((i===0?'easy':'long')===type&&plannedDate(w,i)>=fromDate)count++;
+  }
+  return count;
+}
+function validatePlanRule(r){
+  if(!r||typeof r!=='object'||Array.isArray(r))throw new Error('Ungültige Planvorgabe.');
+  const type=String(r.type||'');
+  if(type!=='easy'&&type!=='long')throw new Error('Planvorgabe benötigt type: easy oder long.');
+  const lo=String(r.paceFrom||''),hi=String(r.paceTo||''),zone=Number(r.zone);
+  if(!Number.isFinite(paceMinutes(lo))||!Number.isFinite(paceMinutes(hi))||paceMinutes(lo)<4||paceMinutes(hi)>13||paceMinutes(lo)>paceMinutes(hi))throw new Error('Globale Pace ist ungültig (z. B. 8:00–9:00).');
+  if(!Number.isInteger(zone)||zone<1||zone>5)throw new Error('Pulszone muss zwischen 1 und 5 liegen.');
+  const date=String(r.fromDate||'');
+  if(!/^20\d{2}-\d{2}-\d{2}$/.test(date)||dateStr(parseDate(date))!==date)throw new Error('Ungültiges Startdatum für Planvorgabe.');
+  const today=dateStr(new Date());
+  if(date<today)throw new Error('Planvorgaben dürfen nur für kommende Einheiten gelten.');
+  const target=findWorkoutByDate(date);
+  if(!target||(target.index===0?'easy':'long')!==type||(target.week===PLAN.length-1&&target.index===1))throw new Error('Das Startdatum muss ein geplanter Trainingstag des richtigen Typs sein.');
+  if(date===today&&sessionDoneFlags(target.week)[target.index])throw new Error('Das Startdatum ist bereits absolviert. Bitte das nächste Training wählen.');
+  return {type,fromDate:date,paceFrom:lo,paceTo:hi,zone,guidance:String(r.guidance||'').trim().slice(0,250),reason:String(r.reason||'').trim().slice(0,350)};
+}
 function workoutData(week,index){
   const raw=baseSessionPrescription(index,week);
   const race=week===PLAN.length-1&&index===1;
@@ -80,7 +124,21 @@ function workoutData(week,index){
     paceFrom:index===0?'7:15':'7:25',paceTo:index===0?'8:15':'8:40',zone:2,
     structure:raw.structure,reason:raw.why,rpe:raw.rpe,icon:raw.icon,race};
   const override=state.planOverrides[workoutKey(week,index)];
-  return {...defaults,...(!race&&override&&typeof override==='object'?override:{}),date:plannedDate(week,index),race};
+  const rule=race?null:activePlanRule(week,index);
+  const custom=!race&&override&&typeof override==='object'?override:null;
+  let result={...defaults,...(custom||{})};
+  if(rule){
+    const coachIsNewer=!custom||custom.source!=='Manuell'&&String(custom.changedAt||'')<=String(rule.changedAt||'');
+    if(coachIsNewer){
+      result.paceFrom=rule.paceFrom;result.paceTo=rule.paceTo;result.zone=rule.zone;
+      result.reason=rule.reason||result.reason;
+      if(index===0&&week>=16&&week<=21){
+        result.structure=`5–8 Min. locker starten → ${fmtKm(result.distanceKm)} entspannt in Zone ${rule.zone} → 5 Min. gehen. Keine flotteren Abschnitte erzwingen.`;
+      }
+      if(rule.guidance)result.structure=result.structure+' '+rule.guidance;
+    }
+  }
+  return {...result,date:plannedDate(week,index),race,ruleActive:!!rule};
 }
 function paceMinutes(p){if(!/^\d{1,2}:\d{2}$/.test(String(p)))return NaN;const [m,s]=p.split(':').map(Number);return s<60?m+s/60:NaN}
 function workoutResult(week,index){
@@ -89,7 +147,7 @@ function workoutResult(week,index){
   const duration=w.race?'Ziel unter 2:30 h':`ca. ${Math.round(w.distanceKm*paceMinutes(w.paceFrom))}–${Math.round(w.distanceKm*paceMinutes(w.paceTo))} Min. Laufzeit`;
   const raw=baseSessionPrescription(index,week);
   const overridden=Boolean(state.planOverrides[workoutKey(week,index)])&&!w.race;
-  return {...raw,...w,dist:fmtKm(w.distanceKm),pace,pulse:w.race?'Zone 2–3 (nach Gefühl)':`Zone ${w.zone}`,duration,why:w.reason,overridden};
+  return {...raw,...w,dist:fmtKm(w.distanceKm),pace,pulse:w.race?'Zone 2–3 (nach Gefühl)':`Zone ${w.zone}`,duration,why:w.reason,overridden,ruleActive:!!w.ruleActive};
 }
 function trainingHistory(action,week,index,previous,next){
   state.changeLog.push({at:new Date().toISOString(),action,week,index,date:plannedDate(week,index),previous:previous||null,next:next||null});
@@ -145,7 +203,7 @@ function renderDetailedSessions(week){
     const name=document.createElement('div');name.className='workout-name';
     const title=document.createElement('h3');title.textContent=s.title;
     const note=document.createElement('p');note.textContent=`${displayDate(s.date)} · ${s.duration}`;
-    name.append(title,note);const tag=document.createElement('span');tag.className='session-tag'+(done[i]?' done':'');tag.textContent=done[i]?'✓ Erledigt':s.overridden?'✎ Angepasst':s.dist;
+    name.append(title,note);const tag=document.createElement('span');tag.className='session-tag'+(done[i]?' done':'');tag.textContent=done[i]?'✓ Erledigt':s.overridden?'✎ Angepasst':s.ruleActive?'↻ Planvorgabe':s.dist;
     top.append(badge,name,tag);card.append(top);
     const grid=document.createElement('div');grid.className='workout-metrics';
     for(const [label,text] of [['Distanz',s.dist],['Pace',s.pace],['Puls',s.pulse],['Anstrengung',s.rpe]]){
@@ -203,9 +261,10 @@ function renderPlan(){
   el('weekPicker').value=String(i);
   el('weekMeta').textContent=i===current?'Aktuelle Woche · 2 Laufeinheiten':`Vorschau / Rückblick · Woche ${i+1} · kein Pflichtprogramm`;
   renderDetailedSessions(i);
+  el('easyPaceGuide').textContent=sessionPrescription(0,i).pace;el('longPaceGuide').textContent=sessionPrescription(1,i).race?'Lauf 2: Wettkampf':sessionPrescription(1,i).pace;
   renderTrainingHorizon(i);
   renderMilestones(el('roadmap'));
-  el('planSafetyNote').textContent='Änderungen bleiben lokal gespeichert.';
+  el('planSafetyNote').textContent='Änderungen bleiben lokal gespeichert. Dauerhafte Vorgaben findest du unter Coach → Vom Coach übernehmen.';
 }
 function loadTrainingFields(){}
 function renderChart(){const target=el('weeklyChart');target.replaceChildren();const runs=allRuns(),start=addDays(weekMonday(new Date()),-49);const v=Array.from({length:8},(_,i)=>{const d=addDays(start,i*7),end=addDays(d,7);return {label:'KW '+isoWeek(d),km:sumKm(runs.filter(r=>{const t=parseDate(r.date);return t>=d&&t<end}))}});const max=Math.max(1,...v.map(x=>x.km));for(const x of v){const col=document.createElement('div');col.className='chart-column';const val=document.createElement('span');val.className='chart-val';val.textContent=formatNumber(x.km,0);const slot=document.createElement('div');slot.className='chart-barslot';const bar=document.createElement('div');bar.className='chart-bar';bar.style.height=`${Math.max(2,Math.round(x.km/max*140))}px`;bar.title=fmtKm(x.km);slot.append(bar);const lab=document.createElement('span');lab.className='chart-col-label';lab.textContent=x.label;col.append(val,slot,lab);target.append(col)}}
@@ -241,9 +300,10 @@ function coachingText(){const all=allRuns(),recent=all.slice(0,10),last28=all.fi
   `Sub-2:30-Status: ${progressReadiness(all).tag}; ${progressReadiness(all).body}`,
   `Puls-Pace-Vergleich: ${fitnessTrend().message}`,
   `Wettkampfprognose: ${raceForecast()}`,
-  `Trainingsanpassungen: ${Object.keys(state.planOverrides).length} individuell geänderte Einheiten.`,
+  `Trainingsanpassungen: ${Object.keys(state.planOverrides).length} individuell geänderte Einheiten; ${(state.planRules||[]).length} langfristige Pace-/Zonenvorgaben.`,
+  ...((state.planRules||[]).map(r=>`Dauerhafte Vorgabe ${r.type==='easy'?'Locker':'Länger'} ab ${r.fromDate}: ${r.paceFrom}–${r.paceTo} min/km, Zone ${r.zone}, ${r.reason||''}`)),
   '', 'Neueste Läufe (Datum | Distanz | Pace | Puls | Belastung | Notiz):'
-];if(!recent.length)lines.push('Noch keine Aktivitäten erfasst.');for(const r of recent)lines.push(`${displayDate(r.date)} | ${fmtKm(r.km)} | ${minsPerKm(r.km,r.seconds)} | ${r.hr||'–'} bpm | RPE ${feedbackFor(r).rpe||'–'}${feedbackFor(r).test10k?' [10-km-Test]':''}${feedbackFor(r).warning?' [Warnsignal]':''} | ${(feedbackFor(r).note||'–').replace(/\s+/g,' ').slice(0,3000)}`);lines.push('',...recent.flatMap(r=>detailReport(r)),'','Bitte gib mir eine kurze, konkrete Einschätzung: Bin ich hinsichtlich gesunder Steigerung und Sub 2:30 auf dem richtigen Weg? Was sollte ich kommende Woche bei zwei Läufen machen? Gib mir Motivation ohne unrealistischen Druck. Bei zu wenig Daten bitte Unsicherheit klar sagen. Wenn du konkrete Planänderungen empfiehlst, hänge zusätzlich einen Maschinenblock an: ROAD230_UPDATE (neue Zeile), JSON mit version:1 und workouts:[{date im Format YYYY-MM-DD, distanceKm als Zahl, paceFrom und paceTo als MM:SS, zone als Zahl 1–5, title, structure, reason}], END_ROAD230_UPDATE. Verwende ausschließlich die unten genannten tatsächlichen Trainingstermine, niemals den Wettkampftag. Ohne Änderungsbedarf keinen Block ausgeben.', '', `Erlaubte Trainingstermine diese Woche: ${sessionPrescription(0).date} und ${sessionPrescription(1).date}. Anpassungen vor dem Training manuell bestätigen.`);return lines.join('\n')}
+];if(!recent.length)lines.push('Noch keine Aktivitäten erfasst.');for(const r of recent)lines.push(`${displayDate(r.date)} | ${fmtKm(r.km)} | ${minsPerKm(r.km,r.seconds)} | ${r.hr||'–'} bpm | RPE ${feedbackFor(r).rpe||'–'}${feedbackFor(r).test10k?' [10-km-Test]':''}${feedbackFor(r).warning?' [Warnsignal]':''} | ${(feedbackFor(r).note||'–').replace(/\s+/g,' ').slice(0,3000)}`);lines.push('',...recent.flatMap(r=>detailReport(r)),'','Bitte gib mir eine kurze, konkrete Einschätzung meines Trainings (ohne Bla-Bla). Bei Bedarf: Unterscheide einmalige Änderungen (Distanz/Termin) von dauerhaften Vorgaben (Pace/Zone bei allen folgenden lockeren bzw. langen Läufen). Wenn dauerhafte Änderungen begründet sind, hänge ROAD230_UPDATE, eine neue Zeile mit JSON {"version":2,"planRules":[{"type":"easy","fromDate":"YYYY-MM-DD","paceFrom":"MM:SS","paceTo":"MM:SS","zone":2,"guidance":"kurzer Praxistipp","reason":"Begründung"}],"workouts":[]} und END_ROAD230_UPDATE an. Für die zweite Laufart type:"long" verwenden. Für beide Laufarten bitte zwei Regeln angeben, wenn beide betroffen sind. Startdatum jeweils der nächste noch nicht absolvierte geplante Trainingstag der Laufart. Wenn nur eine einzelne Einheit angepasst werden soll, verwende wie bisher version:1 mit workouts. Nichts ohne nachvollziehbaren Änderungsbedarf ändern. Die langfristigen Distanzen und den Wettkampftag nicht pauschal wegen eines einzigen Laufs umschreiben. Bei zu hohem Puls den Gesprächstest, langsamere Pace und nötigenfalls Gehpausen priorisieren.', '', `Geplante Laufdaten der nächsten vier Wochen: ${Array.from({length:4},(_,n)=>Math.min(PLAN.length-1,weekIdx()+n)).map(w=>`${sessionPrescription(0,w).date} (easy) / ${sessionPrescription(1,w).date} (long)`).join("; ")}. Den Wettkampftag nicht ändern. Anpassungen vor dem Training manuell bestätigen.`);return lines.join('\n')}
 function fitnessTrend(){
   const runs=allRuns().filter(r=>r.hr>=75&&r.hr<=210&&r.km>=3&&r.km<=12&&r.seconds>0).slice().reverse();
   if(runs.length<3)return {message:'Für einen sinnvollen Puls-Pace-Vergleich benötigen wir mindestens 3 Läufe mit Pulswerten über 3–12 km.',ready:false};
@@ -266,7 +326,7 @@ function renderExtras(){
  const runs=allRuns(),trend=fitnessTrend();el('fitnessTrend').textContent=trend.message;el('raceForecast').textContent=raceForecast();
  const last4=recentCompletedWeeks(runs,4),complete=last4.filter(w=>w.count>=2).length;
  el('motivationText').textContent=`${complete} von 4 abgeschlossenen Wochen mit mindestens zwei Läufen. ${complete>=3?'Deine Regelmäßigkeit entwickelt sich gut.':'Keine verpassten Kilometer nachholen – beim nächsten Termin weitermachen.'}`;
- el('planChangesCount').textContent=`${Object.keys(state.planOverrides).length} individuell angepasste Einheiten`;
+ el('planChangesCount').textContent=`${Object.keys(state.planOverrides).length} Einzeländerungen · ${(state.planRules||[]).length} Planregeln`;renderPlanRuleStatus();
 }
 function renderCoach(){el('coachPreview').textContent=coachingText()}
 function renderAll(){renderOverview();renderPlan();renderProgress();renderTrainingInsights();renderCoach();renderExtras();renderWeight()}
@@ -322,6 +382,16 @@ async function syncIntervals(showSuccess=true){
   if(!Array.isArray(body))throw new Error('Die API hat keine Aktivitätenliste geliefert.');
   const previous=new Map(state.synced.map(r=>[r.id,r]));
   const runs=body.filter(a=>['Run','TrailRun','VirtualRun'].includes(a.type)).map(a=>mapIcuActivity(a,previous.get('icu_'+String(a.id)))).filter(a=>/^\d{4}-\d{2}-\d{2}$/.test(a.date)&&a.km>0&&a.km<300);
+  // A manual sync must offer feedback for the latest recent run immediately,
+  // even when "Später" was previously selected. Never interrupt an automatic sync.
+  const now=new Date();
+  const pendingRun=showSuccess ? runs
+    .filter(r=>{const d=parseDate(r.date);return d>=addDays(now,-7)&&d<=now&&!((state.feedback[r.id]?.note||'').trim()||state.feedback[r.id]?.rpe)})
+    .sort((a,b)=>b.date.localeCompare(a.date))[0] : null;
+  if(pendingRun){
+    // Persist basic Garmin data before slow optional split/HR-zone requests.
+    state.synced=runs;save();renderAll();openFeedbackModal(pendingRun.id);
+  }
   let zoneSettings=state.hrZoneSettings;
   try{const settings=await icuGet('/athlete/0/sport-settings/Run',key);if(settings&&Array.isArray(settings.hr_zones))zoneSettings={limits:settings.hr_zones.map(Number),names:settings.hr_zone_names||[],maxHr:settings.max_hr||null,lthr:settings.lthr||null}}catch{}
   state.hrZoneSettings=zoneSettings;
@@ -349,15 +419,12 @@ async function syncIntervals(showSuccess=true){
     const manual=state.weights.filter(w=>w.source!=='Intervals.icu');const has=new Set(manual.map(w=>w.date));
     state.weights=[...manual,...wellness.filter(w=>w&&/\d{4}-\d{2}-\d{2}/.test(w.id||w.date)&&Number(w.weight)>25&&Number(w.weight)<300&&!has.has((w.id||w.date).slice(0,10))).map(w=>({date:(w.id||w.date).slice(0,10),kg:Number(w.weight),source:'Intervals.icu'}))];
   }}catch{}
-  const newRuns=runs.filter(r=>parseDate(r.date)>=addDays(new Date(),-7)).sort((a,b)=>b.date.localeCompare(a.date));
   // Do not replace local feedback: it is keyed by stable Intervals activity IDs.
   state.synced=runs;state.lastSync=new Date().toISOString();save();
   if(el('rememberKey').checked){localStorage.setItem(KEY_STORE,key);sessionStorage.removeItem(KEY_STORE)}else{sessionStorage.setItem(KEY_STORE,key);localStorage.removeItem(KEY_STORE)}
   updateSyncStatus(true);renderAll();
   el('syncMessage').textContent=`${runs.length} Laufaktivitäten geladen. Zusätzliche Puls- und Splitdaten werden übernommen, sofern Intervals.icu sie bereitstellt. Letzter Abruf: ${new Date().toLocaleString('de-AT')}.`;
   el('syncMessage').className='message good';if(showSuccess)toast(`${runs.length} Läufe synchronisiert`);
-  const unreviewed=newRuns.filter(r=>!state.feedback[r.id]&&!state.dismissedFeedback.includes(r.id));
-  if(unreviewed.length)openFeedbackModal(unreviewed[0].id);
  }catch(e){el('syncMessage').className='message error';el('syncMessage').textContent='Synchronisierung fehlgeschlagen: '+e.message;toast('Synchronisierung nicht möglich')}
  finally{btn.disabled=false}
 }
@@ -409,17 +476,19 @@ function resetWorkout(week,index){
  delete state.planOverrides[key];trainingHistory('Zurückgesetzt',week,index,prev,null);save();renderAll();closeWorkoutEditor();toast('Ursprüngliche Einheit wiederhergestellt');
 }
 function readImportedChanges(raw){
- if(typeof raw!=='string'||raw.length>20000)throw new Error('Text ist leer oder zu lang (max. 20.000 Zeichen).');
+ if(typeof raw!=='string'||!raw.trim()||raw.length>24000)throw new Error('Text ist leer oder zu lang (max. 24.000 Zeichen).');
  let text=raw.trim();const begin='ROAD230_UPDATE',end='END_ROAD230_UPDATE';
  if(text.includes(begin)){
   const from=text.indexOf(begin)+begin.length,to=text.indexOf(end,from);
   if(to<0)throw new Error('Abschlussmarker END_ROAD230_UPDATE fehlt.');text=text.slice(from,to).trim();
  }else if(/^```json\s*/i.test(text))text=text.replace(/^```json\s*/i,'').replace(/```\s*$/,'').trim();
- else if(!text.startsWith('{'))throw new Error('Bitte einen ROAD230_UPDATE-Block aus dem Coaching-Chat einfügen.');
+ else if(!text.startsWith('{'))throw new Error('Bitte einen ROAD230_UPDATE-Block einfügen.');
  text=text.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
- let parsed;try{parsed=JSON.parse(text)}catch{throw new Error('Der eingefügte Trainingsblock enthält kein gültiges JSON. Bitte den vollständigen Block kopieren.')}
- if(parsed?.version!==1||!Array.isArray(parsed.workouts)||!parsed.workouts.length||parsed.workouts.length>8)throw new Error('Es werden 1 bis 8 Trainingseinheiten mit version:1 erwartet.');
- const seen=new Set();return parsed.workouts.map(item=>{
+ let parsed;try{parsed=JSON.parse(text)}catch{throw new Error('Der Coaching-Block enthält kein gültiges JSON.')}
+ if(![1,2].includes(parsed?.version))throw new Error('Nur version:1 oder version:2 wird unterstützt.');
+ const workouts=parsed.workouts||[],ruleData=parsed.version===2?(parsed.planRules||[]):[];
+ if(!Array.isArray(workouts)||workouts.length>8||!Array.isArray(ruleData)||ruleData.length>2||(!workouts.length&&!ruleData.length))throw new Error('Erwartet: bis zu 8 einzelne Einheiten und/oder 2 dauerhafte Regeln.');
+ const seen=new Set(),changes=workouts.map(item=>{
    if(!/^20\d{2}-\d{2}-\d{2}$/.test(item?.date||''))throw new Error('Ein Trainingsdatum fehlt oder ist ungültig.');
    const target=findWorkoutByDate(item.date);if(!target)throw new Error(`Für ${item.date} gibt es keinen geplanten Trainingstermin. Tage in den Einstellungen prüfen.`);
    if(target.week===PLAN.length-1&&target.index===1)throw new Error('Der Wettkampftag ist gesperrt.');
@@ -427,28 +496,78 @@ function readImportedChanges(raw){
    const old=workoutData(target.week,target.index),merged={...old,...item};
    return {...target,date:item.date,old,newWorkout:validWorkoutChange(merged)};
  });
+ const seenTypes=new Set(),rules=ruleData.map(r=>{
+   const rule=validatePlanRule(r);
+   if(seenTypes.has(rule.type))throw new Error('Je Laufart nur eine dauerhafte Regel pro Import.');
+   seenTypes.add(rule.type);
+   return {...rule,affected:futureRuleCount(rule.type,rule.fromDate)};
+ });
+ return {changes,rules};
+}
+function renderPlanRuleStatus(){
+ const box=el('planRulesStatus');if(!box)return;box.replaceChildren();
+ const rules=state.planRules||[];
+ if(!rules.length){const p=document.createElement('p');p.className='hint';p.textContent='Noch keine dauerhaften Planvorgaben. Der bisherige Trainingsplan gilt unverändert.';box.append(p);el('clearPlanRules').classList.add('hidden');return;}
+ el('clearPlanRules').classList.remove('hidden');
+ for(const type of ['easy','long']){
+  const found=rules.filter(r=>r.type===type).sort((a,b)=>a.fromDate.localeCompare(b.fromDate));
+  if(!found.length)continue;
+  const rule=found[found.length-1],p=document.createElement('p');p.className='plan-rule-item';
+  p.textContent=`${type==='easy'?'Lauf 1 · Locker':'Lauf 2 · Länger'}: ab ${displayDate(rule.fromDate)} · ${rule.paceFrom}–${rule.paceTo} min/km · Zone ${rule.zone}`;
+  box.append(p);
+ }
 }
 function previewCoachingImport(){
  const target=el('importPreview');target.replaceChildren();pendingImport=null;el('applyImport').disabled=true;
  try{
-   const changes=readImportedChanges(el('importText').value);pendingImport=changes;
-   for(const item of changes){
+   const data=readImportedChanges(el('importText').value);pendingImport=data;
+   for(const r of data.rules){
      const row=document.createElement('div');row.className='import-item';
-     const title=document.createElement('strong');title.textContent=`${displayDate(item.date)} · ${item.newWorkout.title}`;
+     const title=document.createElement('strong');title.textContent=`Dauerhaft · ${r.type==='easy'?'Lauf 1 (locker)':'Lauf 2 (länger)'}`;
+     const detail=document.createElement('p');detail.textContent=`Ab ${displayDate(r.fromDate)}: ${r.paceFrom}–${r.paceTo} min/km, Zone ${r.zone} · ${r.affected} zukünftige Einheiten`;
+     const note=document.createElement('small');note.textContent=r.reason||'Keine Begründung angegeben';row.append(title,detail,note);target.append(row);
+   }
+   for(const item of data.changes){
+     const row=document.createElement('div');row.className='import-item';
+     const title=document.createElement('strong');title.textContent=`Einmalig · ${displayDate(item.date)} · ${item.newWorkout.title}`;
      const detail=document.createElement('p');detail.textContent=`Vorher: ${fmtKm(item.old.distanceKm)}, ${item.old.paceFrom}–${item.old.paceTo}, Zone ${item.old.zone} → Neu: ${fmtKm(item.newWorkout.distanceKm)}, ${item.newWorkout.paceFrom}–${item.newWorkout.paceTo}, Zone ${item.newWorkout.zone}`;
      const note=document.createElement('small');note.textContent=item.newWorkout.reason||'Begründung: nicht angegeben';row.append(title,detail,note);target.append(row);
    }
-   el('applyImport').disabled=false;toast(`${changes.length} Änderung(en) geprüft – bitte bestätigen`);
+   el('applyImport').disabled=false;toast('Vorschau bereit – Änderungen erst nach Bestätigung aktiv');
  }catch(err){const line=document.createElement('p');line.className='error-text';line.textContent=err.message;target.append(line)}
 }
 function applyCoachingImport(){
- if(!pendingImport?.length)return;
- // Reparse to ensure the text was not changed after the preview.
+ if(!pendingImport)return;
  let latest;try{latest=readImportedChanges(el('importText').value)}catch(err){toast(err.message);return}
- if(JSON.stringify(latest.map(i=>i.newWorkout))!==JSON.stringify(pendingImport.map(i=>i.newWorkout))){toast('Text geändert. Bitte Vorschau erneut prüfen.');return}
- for(const item of latest)saveWorkoutOverride(item.week,item.index,item.newWorkout,'Coaching-Import');
- const count=latest.length;pendingImport=null;el('importText').value='';el('importPreview').replaceChildren();el('applyImport').disabled=true;
- inspectedWeek=latest[0].week;renderAll();toast(`${count} Änderung(en) übernommen. Zur Sicherheit ein Backup erstellen.`);
+ if(JSON.stringify(latest)!==JSON.stringify(pendingImport)){toast('Änderungen bitte erneut prüfen.');return}
+ const rules=latest.rules.map(r=>{const {affected,...rest}=r;return {...rest,changedAt:new Date().toISOString()}});
+ const oldRules=(state.planRules||[]).slice();
+ state.planRules=[...oldRules,...rules].slice(-50);
+ for(const item of latest.changes){
+   const k=workoutKey(item.week,item.index),previous=state.planOverrides[k]||null;
+   state.planOverrides[k]={...item.newWorkout,source:'Coaching-Import',changedAt:new Date().toISOString()};
+   trainingHistory('Coaching-Import',item.week,item.index,previous,state.planOverrides[k]);
+ }
+ save();const count=latest.changes.length,ruleCount=latest.rules.length;
+ pendingImport=null;el('importText').value='';el('importPreview').replaceChildren();el('applyImport').disabled=true;
+ renderAll();toast(`${ruleCount} dauerhafte Vorgabe(n), ${count} Einzelanpassung(en) übernommen.`);
+}
+function resetPlanRules(){
+ if(!(state.planRules||[]).length)return;
+ if(!confirm('Alle dauerhaften Pace- und Pulszonen-Vorgaben entfernen? Einzelne Trainingseinheiten bleiben angepasst.'))return;
+ state.planRules=[];save();renderAll();toast('Dauerhafte Vorgaben entfernt');
+}
+function previewGlobalPlanForm(){
+ try{
+  const dateEasy=firstUpcomingWorkoutDate(0),dateLong=firstUpcomingWorkoutDate(1);
+  if(!dateEasy||!dateLong)throw new Error('Keine kommenden Trainingseinheiten für beide Laufarten vorhanden.');
+  const zone=Number(el('globalZone').value),why=el('globalReason').value.trim();
+  const rules=[{type:'easy',fromDate:dateEasy,paceFrom:el('globalEasyFrom').value.trim(),paceTo:el('globalEasyTo').value.trim(),zone,guidance:'Gesprächstest und Belastungsgefühl priorisieren; bei Bedarf langsamer laufen oder Gehpausen machen.',reason:why||'Vorgaben aus dem Training angepasst.'},
+  {type:'long',fromDate:dateLong,paceFrom:el('globalLongFrom').value.trim(),paceTo:el('globalLongTo').value.trim(),zone,guidance:'Locker laufen; bei zu hohem Puls langsamer werden oder Gehpausen machen.',reason:why||'Vorgaben aus dem Training angepasst.'}];
+  rules.forEach(validatePlanRule);
+  el('importText').value='ROAD230_UPDATE\n'+JSON.stringify({version:2,planRules:rules,workouts:[]},null,2)+'\nEND_ROAD230_UPDATE';
+  previewCoachingImport();el('importPreview').scrollIntoView({behavior:'smooth',block:'nearest'});
+ }catch(e){toast(e.message)}
 }
 function persistTrainingDays(){
  const next={easyDay:Number(el('easyDay').value),easyTime:el('easyTime').value,longDay:Number(el('longDay').value),longTime:el('longTime').value};
@@ -494,7 +613,7 @@ function openFeedbackModal(id){const r=allRuns().find(x=>x.id===id);if(!r)return
  const f=feedbackFor(r);el('modalRpe').value=f.rpe?String(f.rpe):'';el('modalNotes').value=f.note||'';el('modalWarning').checked=!!f.warning;
  el('feedbackModal').classList.remove('hidden');document.body.classList.add('has-modal');
 }
-function closeFeedbackModal(dismiss=true){if(dismiss&&activeModalRun&&!state.dismissedFeedback.includes(activeModalRun)){state.dismissedFeedback.push(activeModalRun);save()}
+function closeFeedbackModal(dismiss=false){if(dismiss&&activeModalRun&&!state.dismissedFeedback.includes(activeModalRun)){state.dismissedFeedback.push(activeModalRun);save()}
  activeModalRun=null;el('feedbackModal').classList.add('hidden');document.body.classList.remove('has-modal')
 }
 function saveModalFeedback(e){e.preventDefault();if(!activeModalRun)return;
@@ -534,5 +653,5 @@ function detailReport(r){const d=r.detail||{},parts=[`Zusatzdaten zu ${displayDa
  const w=findWorkoutByDate(r.date);if(w){const planned=workoutData(w.week,w.index);parts.push(`Soll/Ist am ${r.date}: geplante Einheit ${planned.title}, ${planned.distanceKm} km, ${planned.paceFrom}–${planned.paceTo} min/km, Zone ${planned.zone}; tatsächlich ${fmtKm(r.km)}, ${minsPerKm(r.km,r.seconds)}.`)}
  return parts;
 }
-function init(){state.raceDate=RACE_DATE;const weekPicker=el('weekPicker');for(let i=0;i<PLAN.length;i++){const op=document.createElement('option');op.value=String(i);op.textContent=`Woche ${i+1} · ${displayDate(dateStr(addDays(START,i*7)))}`;weekPicker.append(op)}weekPicker.addEventListener('change',()=>{inspectedWeek=Number(weekPicker.value);renderPlan()});loadTrainingFields();for(const n of document.querySelectorAll('[data-tab]'))n.addEventListener('click',()=>showPage(n.dataset.tab));for(const n of document.querySelectorAll('[data-show]'))n.addEventListener('click',()=>showPage(n.dataset.show));el('syncNow').addEventListener('click',()=>syncIntervals());el('connectIcu').addEventListener('click',()=>syncIntervals());el('toggleKey').addEventListener('click',()=>{const t=el('icuKey');t.type=t.type==='password'?'text':'password';el('toggleKey').textContent=t.type==='password'?'Anzeigen':'Verbergen'});el('forgetKey').addEventListener('click',()=>{localStorage.removeItem(KEY_STORE);sessionStorage.removeItem(KEY_STORE);el('icuKey').value='';el('rememberKey').checked=false;el('syncMessage').className='message';el('syncMessage').textContent='API-Schlüssel aus diesem Browser entfernt. Bereits geladene Trainingsdaten bleiben erhalten.';updateSyncStatus(false);toast('Schlüssel entfernt')});el('downloadReminders').addEventListener('click',generateCalendar);el('addRunTop').addEventListener('click',openEntry);el('addRunInline').addEventListener('click',openEntry);el('closeEntry').addEventListener('click',()=>el('entryCard').classList.add('hidden'));el('manualForm').addEventListener('submit',writeRun);el('feedbackForm').addEventListener('submit',saveFeedback);el('closeFeedback').addEventListener('click',()=>el('feedbackCard').classList.add('hidden'));el('copyCoaching').addEventListener('click',()=>copyText(coachingText()));el('workoutEditForm').addEventListener('submit',applyManualWorkout);el('closeWorkoutEdit').addEventListener('click',closeWorkoutEditor);el('checkImport').addEventListener('click',previewCoachingImport);el('applyImport').addEventListener('click',applyCoachingImport);el('importText').addEventListener('input',()=>{pendingImport=null;el('applyImport').disabled=true;el('importPreview').replaceChildren()});el('weightSave').addEventListener('click',saveWeight);el('weightDate').value=dateStr(new Date());el('trainingWeekFilter').addEventListener('change',()=>{el('runDetails').classList.add('hidden');renderProgress()});el('modalFeedbackForm').addEventListener('submit',saveModalFeedback);el('modalLater').addEventListener('click',()=>closeFeedbackModal());el('modalSkip').addEventListener('click',()=>closeFeedbackModal());for(const id of ['easyDay','easyTime','longDay','longTime'])el(id).addEventListener('change',persistTrainingDays);el('backupData').addEventListener('click',()=>download('sub-230-backup-'+dateStr(new Date())+'.json',JSON.stringify({app:'road230',version:7,...state},null,2),'application/json'));el('restoreFile').addEventListener('change',async(e)=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{if(f.size>5000000)throw new Error('Datei zu groß');const o=JSON.parse(await f.text());if(o.app!=='road230'||!Array.isArray(o.manual)||!Array.isArray(o.synced))throw new Error('Ungültiges Backup');if(!confirm('Aktuelle lokale Trainingsdaten durch dieses Backup ersetzen?'))return;state={...DEFAULT,...o,raceDate:RACE_DATE,training:{},planOverrides:o.planOverrides&&typeof o.planOverrides==='object'&&!Array.isArray(o.planOverrides)?o.planOverrides:{},changeLog:Array.isArray(o.changeLog)?o.changeLog.slice(-50):[],profile:{notes:typeof o.profile?.notes==='string'?o.profile.notes.slice(0,600):''},weights:Array.isArray(o.weights)?o.weights:[],dismissedFeedback:Array.isArray(o.dismissedFeedback)?o.dismissedFeedback:[],hrZoneSettings:o.hrZoneSettings||null,reminders:{...DEFAULT.reminders,...(o.reminders||{})}};save();loadReminders();loadTrainingFields();renderAll();toast('Backup importiert')}catch(e){toast('Import fehlgeschlagen: '+e.message)}e.target.value=''});el('resetData').addEventListener('click',()=>{if(!confirm('Wirklich alle lokalen Trainingsdaten löschen? API-Schlüssel bleibt gespeichert und muss separat entfernt werden.'))return;state={...DEFAULT,training:{},reminders:{...DEFAULT.reminders},planOverrides:{},changeLog:[],profile:{notes:''},weights:[],dismissedFeedback:[],hrZoneSettings:null};save();loadReminders();loadTrainingFields();renderAll();toast('Lokale Trainingsdaten gelöscht')});el('rememberKey').addEventListener('change',()=>{if(el('rememberKey').checked&&getApiKey()){localStorage.setItem(KEY_STORE,getApiKey())}else{const k=localStorage.getItem(KEY_STORE);if(k)sessionStorage.setItem(KEY_STORE,k);localStorage.removeItem(KEY_STORE)}});loadReminders();const saved=localStorage.getItem(KEY_STORE),temp=sessionStorage.getItem(KEY_STORE);if(saved){el('icuKey').value=saved;el('rememberKey').checked=true}else if(temp){el('icuKey').value=temp}renderAll();if(state.lastSync)updateSyncStatus(true);if(saved)syncIntervals(false);if('serviceWorker' in navigator && location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{})}
+function init(){state.raceDate=RACE_DATE;const weekPicker=el('weekPicker');for(let i=0;i<PLAN.length;i++){const op=document.createElement('option');op.value=String(i);op.textContent=`Woche ${i+1} · ${displayDate(dateStr(addDays(START,i*7)))}`;weekPicker.append(op)}weekPicker.addEventListener('change',()=>{inspectedWeek=Number(weekPicker.value);renderPlan()});loadTrainingFields();for(const n of document.querySelectorAll('[data-tab]'))n.addEventListener('click',()=>showPage(n.dataset.tab));for(const n of document.querySelectorAll('[data-show]'))n.addEventListener('click',()=>showPage(n.dataset.show));el('syncNow').addEventListener('click',()=>syncIntervals());el('connectIcu').addEventListener('click',()=>syncIntervals());el('toggleKey').addEventListener('click',()=>{const t=el('icuKey');t.type=t.type==='password'?'text':'password';el('toggleKey').textContent=t.type==='password'?'Anzeigen':'Verbergen'});el('forgetKey').addEventListener('click',()=>{localStorage.removeItem(KEY_STORE);sessionStorage.removeItem(KEY_STORE);el('icuKey').value='';el('rememberKey').checked=false;el('syncMessage').className='message';el('syncMessage').textContent='API-Schlüssel aus diesem Browser entfernt. Bereits geladene Trainingsdaten bleiben erhalten.';updateSyncStatus(false);toast('Schlüssel entfernt')});el('downloadReminders').addEventListener('click',generateCalendar);el('addRunTop').addEventListener('click',openEntry);el('addRunInline').addEventListener('click',openEntry);el('closeEntry').addEventListener('click',()=>el('entryCard').classList.add('hidden'));el('manualForm').addEventListener('submit',writeRun);el('feedbackForm').addEventListener('submit',saveFeedback);el('closeFeedback').addEventListener('click',()=>el('feedbackCard').classList.add('hidden'));el('copyCoaching').addEventListener('click',()=>copyText(coachingText()));el('workoutEditForm').addEventListener('submit',applyManualWorkout);el('closeWorkoutEdit').addEventListener('click',closeWorkoutEditor);el('checkImport').addEventListener('click',previewCoachingImport);el('applyImport').addEventListener('click',applyCoachingImport);el('jumpCoachImport').addEventListener('click',()=>el('coachImportCard').scrollIntoView({behavior:'smooth',block:'start'}));el('makeGlobalPlan').addEventListener('click',previewGlobalPlanForm);el('clearPlanRules').addEventListener('click',resetPlanRules);el('importText').addEventListener('input',()=>{pendingImport=null;el('applyImport').disabled=true;el('importPreview').replaceChildren()});el('weightSave').addEventListener('click',saveWeight);el('weightDate').value=dateStr(new Date());el('trainingWeekFilter').addEventListener('change',()=>{el('runDetails').classList.add('hidden');renderProgress()});el('modalFeedbackForm').addEventListener('submit',saveModalFeedback);el('modalLater').addEventListener('click',()=>closeFeedbackModal());el('modalSkip').addEventListener('click',()=>closeFeedbackModal());for(const id of ['easyDay','easyTime','longDay','longTime'])el(id).addEventListener('change',persistTrainingDays);el('backupData').addEventListener('click',()=>download('sub-230-backup-'+dateStr(new Date())+'.json',JSON.stringify({app:'road230',version:'8',...state},null,2),'application/json'));el('restoreFile').addEventListener('change',async(e)=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{if(f.size>5000000)throw new Error('Datei zu groß');const o=JSON.parse(await f.text());if(o.app!=='road230'||!Array.isArray(o.manual)||!Array.isArray(o.synced))throw new Error('Ungültiges Backup');if(!confirm('Aktuelle lokale Trainingsdaten durch dieses Backup ersetzen?'))return;state={...DEFAULT,...o,raceDate:RACE_DATE,training:{},planOverrides:o.planOverrides&&typeof o.planOverrides==='object'&&!Array.isArray(o.planOverrides)?o.planOverrides:{},changeLog:Array.isArray(o.changeLog)?o.changeLog.slice(-50):[],profile:{notes:typeof o.profile?.notes==='string'?o.profile.notes.slice(0,600):''},weights:Array.isArray(o.weights)?o.weights:[],dismissedFeedback:Array.isArray(o.dismissedFeedback)?o.dismissedFeedback:[],hrZoneSettings:o.hrZoneSettings||null,planRules:Array.isArray(o.planRules)?o.planRules.slice(-50):[],reminders:{...DEFAULT.reminders,...(o.reminders||{})}};save();loadReminders();loadTrainingFields();renderAll();toast('Backup importiert')}catch(e){toast('Import fehlgeschlagen: '+e.message)}e.target.value=''});el('resetData').addEventListener('click',()=>{if(!confirm('Wirklich alle lokalen Trainingsdaten löschen? API-Schlüssel bleibt gespeichert und muss separat entfernt werden.'))return;state={...DEFAULT,training:{},reminders:{...DEFAULT.reminders},planOverrides:{},changeLog:[],profile:{notes:''},weights:[],dismissedFeedback:[],hrZoneSettings:null,planRules:[]};save();loadReminders();loadTrainingFields();renderAll();toast('Lokale Trainingsdaten gelöscht')});el('rememberKey').addEventListener('change',()=>{if(el('rememberKey').checked&&getApiKey()){localStorage.setItem(KEY_STORE,getApiKey())}else{const k=localStorage.getItem(KEY_STORE);if(k)sessionStorage.setItem(KEY_STORE,k);localStorage.removeItem(KEY_STORE)}});loadReminders();const saved=localStorage.getItem(KEY_STORE),temp=sessionStorage.getItem(KEY_STORE);if(saved){el('icuKey').value=saved;el('rememberKey').checked=true}else if(temp){el('icuKey').value=temp}renderAll();if(state.lastSync)updateSyncStatus(true);if(saved)syncIntervals(false);if('serviceWorker' in navigator && location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 document.addEventListener('DOMContentLoaded',init);

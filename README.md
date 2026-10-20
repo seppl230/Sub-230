@@ -1,85 +1,24 @@
-# Sub 230 – Version 6.3
+# SUB 230 – V8
 
-Kostenlose, lokal arbeitende Trainings-Web-App für den Halbmarathon am **4. April 2027**. Kein neuer App-Account und kein KI-API-Abonnement erforderlich.
+**Direktes Upgrade von V7.2, V7.1 oder V7.** Alle Funktionen und Verbesserungen der vorherigen Versionen sind enthalten; Zwischenupdates sind nicht nötig.
 
-## Neu in V5
+## Änderungen
 
-- **Jede Trainingseinheit bearbeiten:** Distanz, Pace-Bereich (mm:ss), Garmin-Pulszone, Belastung und Ablauf; Original jederzeit wiederherstellen.
-- **Coaching-Anpassungen importieren:** Einen `ROAD230_UPDATE`-Block aus dem separaten Coaching-Chat einfügen, Vorher/Nachher ansehen und Änderungen ausdrücklich bestätigen. Nie automatische Schreibzugriffe auf den Trainingsplan.
-- **Echte Trainingstermine:** Dienstag und Donnerstag sind die Vorgaben, Änderungen an Wochentagen/Uhrzeiten werden sofort lokal gespeichert. Rennen fix am Sonntag, 04.04.2027.
-- **Trainingskontinuität:** Zwei Läufe/Woche, 4-Wochen-Übersicht ohne Straf-Streaks.
-- **Puls-Pace-Vergleich:** Nur vergleichbare Läufe mit ähnlichem Puls und Distanz.
-- **Vorsichtige Wettkampf-Einschätzung:** Eine grobe Zeitspanne erst nach mehreren Wochen mit ausreichend Läufen, mindestens einem langen Lauf und einem ausdrücklich markierten, anstrengenden 10-km-Test. Keine medizinische oder sportdiagnostische Aussage.
-- **Feedback:** RPE, Notizen und optionale Markierungen für Warnzeichen bzw. 10-km-Test.
-- **Privater Coaching-Kontext:** Freie Angaben nur lokal speichern; nicht mehr fest im öffentlichen JavaScript.
-- **Backups:** Planänderungen und Coaching-Kontext werden mitgesichert. API-Schlüssel **nicht** im Backup enthalten.
+- **Coach → Vom Coach übernehmen:** Der komplette Bereich zum Übernehmen von Trainingsempfehlungen befindet sich jetzt im Reiter **Coach**, unmittelbar nach dem Coaching-Bereich. Im Trainingsplan erscheint er nicht mehr.
+- **Beide Importarten unverändert:** Einzelne Trainingsänderungen mit `ROAD230_UPDATE` Version 1 sowie dauerhafte Regeln mit Version 2. Auch die manuellen Regeln für beide Lauftage und die Vorschau vor dem Übernehmen bleiben erhalten.
+- **Darstellung korrigiert:** Lange Coaching-Berichte, Änderungszähler, Wochenfilter, Trainingskarten, Detailtabellen und Eingabe-/Schaltflächen passen sich auch an schmale Bildschirme an. Alle bisherigen Farben und das Stoppuhr-Logo bleiben gleich.
+- **Vorhandene Daten:** Garmin-Läufe, Kommentare, Pulswerte, Gewicht, Einzelanpassungen, wiederkehrende Planregeln und API-Schlüssel bleiben im bisherigen Browser-Speicher. Der gespeicherte API-Schlüssel ist **nicht** in JSON-Backups enthalten.
 
-## Vor dem Update: Datensicherung
+## Installation auf GitHub Pages
 
-1. Öffne die bisherige App unter https://seppl230.github.io/Sub-230/.
-2. Unter **Einstellungen → JSON-Backup erstellen** eine Sicherung herunterladen. **Nicht auf GitHub hochladen!** Das Backup enthält Trainingsdaten und Notizen.
-3. Entpacke `road-to-230-update-v5.zip`.
-4. In https://github.com/seppl230/Sub-230 unter **Add file → Upload files** die vier Dateien `index.html`, `app.js`, `styles.css`, `sw.js` hochladen und die vorhandenen Versionen überschreiben.
-5. **Commit changes**, in **Actions** das Pages-Deployment abwarten, anschließend die App hart neu laden (Windows: **Strg+F5**, iPhone: App schließen und neu öffnen). Unten muss **Version 6.3** stehen.
+1. **Zuerst in der alten App unter Mehr → JSON-Backup erstellen** und die Datei privat aufbewahren, niemals ins öffentliche GitHub-Repository hochladen.
+2. ZIP entpacken. **Alle enthaltenen Dateien direkt ins Stammverzeichnis** von `seppl230/Sub-230` hochladen, gleichnamige Dateien überschreiben und `Commit changes` bestätigen. Den entpackten Ordner selbst nicht hochladen.
+3. Nach dem GitHub-Pages-Deployment die bestehende Web-App aktualisieren. **Nicht vom iPhone löschen**, da sonst lokale Daten verlorengehen können. Sollte noch die alte Version erscheinen, nach einiger Zeit erneut öffnen.
 
-Die App nutzt denselben lokalen Speicher wie V4. Intervals.icu-Schlüssel, vorhandene Läufe und deine bereits eingestellten Wochentage sollten im gleichen Browser erhalten bleiben. Der Schlüssel bleibt jeweils an den ursprünglichen Browser gebunden.
+## Nutzung
 
-## Neue Funktionen nutzen
+1. Nach Garmin- und Intervals.icu-Synchronisierung auf **Daten abrufen** tippen. Für neue, noch unbewertete Läufe erscheint der RPE-/Feedback-Dialog.
+2. Unter **Coach → Zusammenfassung kopieren** den Bericht in den bestehenden ChatGPT-Coaching-Chat einfügen.
+3. Die Antwort mit `ROAD230_UPDATE` unter **Coach → Vom Coach übernehmen** einfügen, Änderungen prüfen und bewusst übernehmen. Du kannst dort auch Pace-/Zonenvorgaben für alle künftigen Einheiten manuell setzen.
 
-**Einheit manuell ändern:** Trainingsplan → gewünschte Woche → „Training bearbeiten“ → Werte ändern → Speichern. Mit „Original wiederherstellen“ werden Änderungen dieser Einheit rückgängig gemacht.
-
-**Coach-Änderungen übernehmen:** Nach dem Lauf Coaching-Bericht in ChatGPT einfügen. Bitte den Coach, bei erforderlichen Änderungen einen strukturierten Block auszugeben. Kopiere **nur** den Block ab `ROAD230_UPDATE` bis `END_ROAD230_UPDATE` in **Trainingsplan → Trainingsempfehlung importieren**. Auf **Änderungen prüfen** tippen, Werte kontrollieren und **Geprüfte Änderungen übernehmen** bestätigen.
-
-Beispiel **nur zur Erklärung**, nicht ungeprüft als Trainingsvorgabe übernehmen:
-
-```
-ROAD230_UPDATE
-{
-  "version": 1,
-  "workouts": [
-    {
-      "date": "2026-10-22",
-      "title": "Längerer Lauf",
-      "distanceKm": 4,
-      "paceFrom": "7:30",
-      "paceTo": "8:30",
-      "zone": 2,
-      "structure": "5 Minuten einlaufen, 4 km locker, 5 Minuten ausgehen.",
-      "reason": "Belastung kontrolliert halten."
-    }
-  ]
-}
-END_ROAD230_UPDATE
-```
-
-Das Datum **muss** einem tatsächlichen Trainingstermin im aktuellen Plan entsprechen, andernfalls wird der Import abgelehnt. Das Wettkampfdatum ist für Änderungen gesperrt. Der Import ersetzt nur die konkret aufgeführten Einheiten.
-
-**Einträge auf iPhone übertragen:** Unter Einstellungen Backup exportieren, Datei privat auf das andere Gerät übertragen und dort **Backup importieren**. Das überschreibt dessen lokale Daten und ersetzt **keine** Geräte-Synchronisation. Vor einem Import immer auch auf dem Zielgerät sichern.
-
-## Sicherheit und Grenzen
-
-- Das GitHub-Pages-Repository ist öffentlich. Besucher sehen den Programmcode, aber nicht automatisch Daten in deinem privaten Browser-Speicher.
-- **Ältere GitHub-Commits bleiben öffentlich abrufbar.** In früheren Versionen fest hinterlegte biografische Angaben verschwinden durch das Update **nicht** aus der Git-Historie. Falls du diese vollständig aus dem öffentlichen Repository entfernen möchtest, ist ein sauberer Neustart des Repositories ohne alte Commits einfacher als nur Dateien zu überschreiben.
-- Ein dauerhaft gespeicherter API-Schlüssel liegt im lokalen Browser-Speicher und ist dort **nicht verschlüsselt**. Nutze für fremde Geräte lieber den Sitzungsmodus und entferne den Schlüssel danach. Den Schlüssel niemals in GitHub, ChatGPT oder Fotos posten.
-- Bei problematischem oder eingeschränktem Garmin-/Intervals.icu-Zugriff funktionieren manuelle Lauf-Einträge weiterhin.
-- Die App synchronisiert Garmin-Daten bei deinem Klick bzw. beim Öffnen, wenn ein gespeicherter Schlüssel vorhanden ist; kein Hintergrundserver.
-- Der Chat läuft weiterhin **separat** in ChatGPT; das Training wird nicht heimlich durch ChatGPT geändert.
-- Die gezeigten Trainingsempfehlungen sind kein Ersatz für medizinische Beratung. Bei Schmerzen, Infekt oder anhaltend ungewöhnlicher Erschöpfung reduziere die Belastung bzw. hole ärztlichen Rat ein.
-
-
-## V6.3 – Icon-Korrektur
-Das ausgewählte 2:30-Stoppuhr-Icon wurde aus der Original-Vorlage freigestellt. Die weißen Bereiche sind transparent. Keine weiteren Änderungen am Design oder an der Trainingslogik.
-
-
-## Version 7
-- Änderungen an Home, Plan, Training und Mehr gemäß Nutzerfeedback.
-- Nach einem **neu** eingelesenen Lauf aus den letzten sieben Tagen fragt ein Dialog nach RPE und Feedback.
-- Gewicht lässt sich in Mehr erfassen; wenn vorhanden werden Intervals.icu-Wellnessgewichte beim Synchronisieren ergänzt.
-- Bei Intervals.icu verfügbare HR-Zonen und Splits für die neuesten zwölf Läufe; fehlende Daten werden nicht erfunden.
-- Bestehender Speicher-Key `road230.v1` bleibt gleich, alte Feedbacks und Plananpassungen bleiben erhalten.
-- Vor dem Update ein JSON-Backup erstellen, **nicht** die App vom Home-Bildschirm entfernen.
-
-### Deployment
-Die Dateien **aus dem ZIP-Hauptverzeichnis direkt ins Stammverzeichnis** des bestehenden GitHub-Repositories hochladen; `index.html` liegt weiterhin im Repository-Stamm. Vorher ein Backup in „Mehr“ anlegen. Nach dem Commit die bestehende iPhone-Web-App aktualisieren; nicht löschen, da gespeicherte lokale Daten sonst verloren gehen können.
-
-Bei aktualisierten bestehenden Läufen (z. B. dem heutigen) erneut „Daten abrufen“, dann unter „Training“ → „Absolvierte Trainings“ → „Trainingsdetails ansehen“ und im Coach den Bericht neu kopieren.
+**Datenschutz:** Die App arbeitet weiterhin ohne zusätzliche KI-API-Kosten. Aus deinem Browser wird kein Coaching-Bericht automatisch an ChatGPT übermittelt; das erfolgt erst durch dein Kopieren/Einfügen. V8 verändert keine Trainingseinheiten von selbst.
