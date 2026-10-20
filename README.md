@@ -69,3 +69,17 @@ Das Datum **muss** einem tatsächlichen Trainingstermin im aktuellen Plan entspr
 
 ## V6.3 – Icon-Korrektur
 Das ausgewählte 2:30-Stoppuhr-Icon wurde aus der Original-Vorlage freigestellt. Die weißen Bereiche sind transparent. Keine weiteren Änderungen am Design oder an der Trainingslogik.
+
+
+## Version 7
+- Änderungen an Home, Plan, Training und Mehr gemäß Nutzerfeedback.
+- Nach einem **neu** eingelesenen Lauf aus den letzten sieben Tagen fragt ein Dialog nach RPE und Feedback.
+- Gewicht lässt sich in Mehr erfassen; wenn vorhanden werden Intervals.icu-Wellnessgewichte beim Synchronisieren ergänzt.
+- Bei Intervals.icu verfügbare HR-Zonen und Splits für die neuesten zwölf Läufe; fehlende Daten werden nicht erfunden.
+- Bestehender Speicher-Key `road230.v1` bleibt gleich, alte Feedbacks und Plananpassungen bleiben erhalten.
+- Vor dem Update ein JSON-Backup erstellen, **nicht** die App vom Home-Bildschirm entfernen.
+
+### Deployment
+Die Dateien **aus dem ZIP-Hauptverzeichnis direkt ins Stammverzeichnis** des bestehenden GitHub-Repositories hochladen; `index.html` liegt weiterhin im Repository-Stamm. Vorher ein Backup in „Mehr“ anlegen. Nach dem Commit die bestehende iPhone-Web-App aktualisieren; nicht löschen, da gespeicherte lokale Daten sonst verloren gehen können.
+
+Bei aktualisierten bestehenden Läufen (z. B. dem heutigen) erneut „Daten abrufen“, dann unter „Training“ → „Absolvierte Trainings“ → „Trainingsdetails ansehen“ und im Coach den Bericht neu kopieren.

@@ -1,156 +1,142 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0c1726">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Sub 230">
-  <meta name="description" content="Dein kostenloses Halbmarathon-Cockpit: Garmin-Import, Trainingsplan und Coaching-Zusammenfassung.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://intervals.icu; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" href="icon-192-v63.png">
-  <link rel="apple-touch-icon" href="icon-192-v63.png">
-  <link rel="stylesheet" href="styles.css?v=6.3">
-  <title>Sub 230 | Dein Halbmarathon-Cockpit</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="#0c1726" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="Sub 230" name="apple-mobile-web-app-title"/>
+<meta content="Dein kostenloses Halbmarathon-Cockpit: Garmin-Import, Trainingsplan und Coaching-Zusammenfassung." name="description"/>
+<meta content="default-src 'self'; connect-src 'self' https://intervals.icu; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'" http-equiv="Content-Security-Policy"/>
+<link href="manifest.webmanifest" rel="manifest"/>
+<link href="icon-192-v63.png" rel="icon" type="image/png"/>
+<link href="icon-192-v63.png" rel="apple-touch-icon"/>
+<link href="styles.css?v=7" rel="stylesheet"/>
+<title>Sub 230 | Dein Halbmarathon-Cockpit</title>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand"><img class="brand-logo-img" src="header-mark-192-v63.png" alt="Sub 230"><div><strong>SUB 230</strong><small>Dein Lauf-Cockpit</small></div></div>
-      <div class="side-head">MENÜ</div>
-      <nav class="desktop-nav" aria-label="Navigation">
-        <button class="nav-btn active" data-tab="overview"><span>◫</span> Übersicht</button>
-        <button class="nav-btn" data-tab="plan"><span>▦</span> Trainingsplan</button>
-        <button class="nav-btn" data-tab="progress"><span>↗</span> Fortschritt</button>
-        <button class="nav-btn" data-tab="coach"><span>✦</span> KI-Coach</button>
-        <button class="nav-btn" data-tab="settings"><span>⚙</span> Einstellungen</button>
-      </nav>
-      <div class="side-bottom"><span class="status-dot"></span><span id="sideSync">Lokaler Modus</span></div>
-    </aside>
-    <div class="workspace">
-      <header class="topbar">
-        <div class="mobile-brand"><img class="brand-logo-img small" src="header-mark-192-v63.png" alt="Sub 230"><strong>SUB 230</strong></div>
-        <div class="top-caption">HALBMARATHON · 04.04.2027</div>
-        <div class="top-right"><span class="pill small"><span class="pulse-dot"></span><span id="topSync">Lokal</span></span></div>
-      </header>
-      <main class="main" id="main">
-        <section class="tab-page active" data-page="overview">
-          <div class="page-heading"><div><p class="eyebrow">DEIN PERSÖNLICHER LAUFCOACH</p><h1>Ein Lauf nach dem anderen<span class="accent">.</span></h1><p class="lead">Du musst Laufen nicht lieben. Du musst nur dranbleiben.</p></div><div class="header-actions"><button class="btn outline" id="syncNow">↻ Daten abrufen</button><button class="btn primary" data-show="plan">↗ Nächstes Training</button></div></div>
-          <div class="hero-grid">
-            <div class="goal-card card"><span class="eyebrow light">DEIN ZIEL</span><div class="goal-number">2<span class="colon">:</span>29<span class="colon">:</span>59</div><div class="hero-row"><span>21,1 km · Halbmarathon</span><span class="hero-tag">7:06 min/km</span></div><div class="hero-bottom"><div><small>Wettkampf</small><strong id="raceText">04.04.2027</strong></div><div><small>Aktueller Schwerpunkt</small><strong id="phaseText">Grundlage aufbauen</strong></div></div></div>
-            <div class="coach-snapshot card next-workout-card"><div class="card-head"><div><p class="eyebrow">NÄCHSTES TRAINING</p><h2 id="nextWorkoutTitle">Lauf 1 · Locker</h2></div><div class="round-icon">↗</div></div><p id="nextWorkoutDate">Dienstag · 4,0 km</p><div class="next-workout-stats"><span id="nextWorkoutPace" class="hero-tag">7:15–8:15 min/km</span><span id="nextWorkoutZone" class="hero-tag alt">Zone 2</span></div><p id="nextWorkoutHint" class="compact-note">Ganz locker bleiben und auf gleichmäßige Atmung achten.</p><div class="insight-footer"><div class="insight-dot">i</div><span id="nextWorkoutFooter">Tippe auf „Trainingsplan“, wenn du die komplette Einheit sehen oder anpassen willst.</span></div></div>
-          </div>
-          <div class="stat-grid">
-            <div class="card stat"><span class="stat-title">Läufe diese Woche</span><div><strong id="statRuns">0 / 2</strong><span class="stat-icon">◷</span></div><small id="statRunsSub">Die Woche hat gerade begonnen</small></div>
-            <div class="card stat"><span class="stat-title">Kilometer · 4 Wochen</span><div><strong id="statKm">0,0 <em>km</em></strong><span class="stat-icon">↗</span></div><small id="statKmSub">Noch keine Läufe protokolliert</small></div>
-            <div class="card stat"><span class="stat-title">Längster Lauf</span><div><strong id="statLong">–</strong><span class="stat-icon">◈</span></div><small id="statLongSub">Noch keine Laufdaten</small></div>
-          </div>
-
-          <div class="card section-card trajectory-card" aria-label="Dein Trainingsstand">
-            <div class="card-head"><div><p class="eyebrow">SUB 2:30 · AKTUELLER STAND</p><h2>Was deine Daten wirklich sagen</h2></div><span class="track-state" id="readinessTag">Noch keine Daten</span></div>
-            <p class="muted" id="readinessText">Erst mit mehreren echten Läufen können wir das Ziel besser einschätzen.</p>
-            <div class="readiness-grid">
-              <div class="readiness-metric"><span>Trainingsroutine</span><strong id="adherenceMetric">–</strong><small id="adherenceCaption">Abgeschlossene Wochen mit 2+ Läufen</small></div>
-              <div class="readiness-metric"><span>Distanzgrundlage</span><strong id="distanceMetric">–</strong><small id="distanceCaption">Nächster sinnvoller Meilenstein</small></div>
-              <div class="readiness-metric"><span>10-km-Testlauf</span><strong id="testMetric">Noch offen</strong><small>Im Februar/März nach ausreichender Grundlage</small></div>
-            </div>
-            <p class="readiness-disclaimer">Trainingsindikatoren, keine Leistungsprognose. Dein Belastungsempfinden und deine Regeneration zählen ebenfalls.</p>
-          </div>
-          <div class="two-col extra-overview">
-            <div class="card section-card"><div class="card-head"><div><p class="eyebrow">WOCHE FÜR WOCHE</p><h2>Deine letzten 4 Wochen</h2></div><button class="text-btn" data-show="progress">Alle Läufe →</button></div><div id="recentWeeks" class="week-breakdown"></div><div class="soft-note">Die laufende Woche ist noch nicht abgeschlossen. Das Ziel sind zwei Lauf-Einheiten, keine perfekte Serie.</div></div>
-            <div class="card section-card"><div class="card-head"><div><p class="eyebrow">NÄCHSTER MEILENSTEIN</p><h2 id="nextMilestoneTitle">Deine ersten Läufe</h2></div></div><div class="next-milestone"><strong id="nextMilestoneValue">4 km</strong><span id="nextMilestoneText">Erst einmal zwei lockere Läufe pro Woche etablieren.</span></div><div class="bar-track next-milestone-bar"><div id="nextMilestoneBar" class="bar-fill" style="width:0%"></div></div><p class="hint">Die Distanz zählt erst, wenn sie tatsächlich gelaufen wurde. Rückschritte oder Entlastungswochen sind normal.</p><button class="btn outline wide" data-show="plan">Roadmap öffnen →</button></div>
-          </div>
-          <div class="two-col">
-            <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEIN NÄCHSTER SCHRITT</p><h2>Diese Woche</h2></div><button class="text-btn" data-show="plan">Ganzer Plan →</button></div><p class="soft-note" id="motivationText">Zwei Läufe pro Woche sind dein Wochenziel – ohne Nachholen.</p><div id="weekSessions"></div><div class="soft-note">Wenn du müde oder nicht erholt bist: Einheit verkürzen oder verschieben.</div></div>
-            <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEIN FORTSCHRITT</p><h2>Auf dem Weg zu 21,1 km</h2></div></div><div class="milestone-list" id="miniMilestones"></div><button class="btn outline wide" data-show="progress">Fortschritt ansehen ↗</button></div>
-          </div>
-        </section>
-        <section class="tab-page" data-page="plan">
-          <div class="page-heading"><div><p class="eyebrow">DEINE ROADMAP</p><h1>Das wird dein Weg<span class="accent">.</span></h1><p class="lead">Zwei Läufe pro Woche bis Sonntag, 4. April 2027. Erholung ist Teil des Plans.</p></div></div>
-          <div class="plan-intro-grid">
-            <div class="card section-card plan-summary-card">
-              <p class="eyebrow">SO TRAINIERST DU</p><h2>Konkrete Vorgaben, ohne Tempodruck</h2>
-              <div class="pace-guide-grid">
-                <div><span>Lockerer Lauf</span><strong>ca. 7:15–8:15 /km</strong><small>RPE 2–4 / 10 · ganze Sätze möglich</small></div>
-                <div><span>Langer Lauf</span><strong>ca. 7:25–8:40 /km</strong><small>RPE 2–4 / 10 · bei Bedarf Gehpausen</small></div>
-                <div><span>Halbmarathon-Ziel</span><strong>7:06 /km</strong><small>Wettkampfpace, NICHT die Pace für lockere Läufe</small></div>
-              </div>
-              <p class="hint">Diese Pace-Spannen sind vorläufige Orientierung, keine individuelle Leistungsdiagnose. Bei Widerspruch haben Gesprächstest, Atmung und Belastungsgefühl Vorrang. Nicht auf Biegen und Brechen in der Spanne bleiben.</p>
-            </div>
-            <div class="card section-card plan-zones-card">
-              <div class="card-head"><div><p class="eyebrow">PULSSTEUERUNG</p><h2>Einfach auf die Uhr schauen</h2></div><span class="pill">Ohne bpm-Eingabe</span></div>
-              <div class="pace-guide-grid">
-                <div><span>Lockere und lange Läufe</span><strong>Zone 2</strong><small>So locker, dass du ganze Sätze sprechen kannst</small></div>
-                <div><span>Optionale flottere Abschnitte</span><strong>Zone 3</strong><small>Erst später im Plan – nur wenn du dich gut fühlst</small></div>
-              </div>
-              <p class="hint">Die Garmin-Uhr zeigt deine individuellen Zonen. Ihre Grenzen können geschätzt sein: Falls Zone 2 nicht zum lockeren Gesprächsgefühl passt, hat dein Körpergefühl Vorrang.</p>
-            </div>
-          </div>
-          <div class="card section-card detailed-plan">
-            <div class="card-head plan-nav-heading"><div><p class="eyebrow">TRAININGSEINHEITEN</p><h2 id="planWeekTitle">Woche 1</h2></div><div class="plan-picker"><label for="weekPicker">Woche ansehen<select id="weekPicker"></select></label><span class="pill" id="planWeekDates"></span></div></div>
-            <div class="week-meta" id="weekMeta"></div>
-            <div id="planSessions" class="session-details"></div>
-            <div id="workoutEditCard" class="edit-card hidden">
-              <div class="card-head"><div><p class="eyebrow">INDIVIDUELLE ANPASSUNG</p><h2>Training bearbeiten</h2></div><button class="text-btn" id="closeWorkoutEdit" type="button">Schließen ✕</button></div>
-              <form id="workoutEditForm" class="form-grid">
-                <label>Datum (aus deinen Trainingstagen)<input id="editDate" type="date" readonly></label>
-                <label>Bezeichnung<input id="editTitle" maxlength="80" required></label>
-                <label>Distanz in km<input id="editDistance" type="number" step="0.1" min="0.5" max="22" required></label>
-                <label>Pulszone<select id="editZone"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
-                <label>Schnellere Pace-Grenze (min/km)<input id="editPaceFrom" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="7:30" required></label>
-                <label>Langsamere Pace-Grenze (min/km)<input id="editPaceTo" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="8:30" required></label>
-                <label class="full">Belastung / RPE<input id="editRpe" maxlength="50" placeholder="2–4 / 10"></label>
-                <label class="full">Ablauf<textarea id="editStructure" rows="3" maxlength="600" required></textarea></label>
-                <label class="full">Begründung / Hinweis<textarea id="editReason" rows="2" maxlength="400"></textarea></label>
-                <div class="full actions"><button class="btn primary" type="submit">Änderung speichern</button></div>
-              </form>
-            </div>
-            <div class="soft-note compact" id="planSafetyNote">Änderungen bleiben lokal gespeichert.</div>
-          </div>
-          <div class="card section-card" id="coachImportCard">
-            <div class="card-head"><div><p class="eyebrow">VOM COACH ÜBERNEHMEN</p><h2>Trainingsempfehlung importieren</h2></div><span class="pill" id="planChangesCount">0 Änderungen</span></div>
-            <p class="muted">Füge hier nur bei Bedarf einen <strong>ROAD230_UPDATE</strong>-Block aus deinem Coaching-Chat ein und bestätige danach die Vorschau.</p>
-            <label for="importText">Coaching-Block hier einfügen<textarea id="importText" rows="6" spellcheck="false" placeholder='ROAD230_UPDATE
+<div class="app-shell">
+<aside class="sidebar">
+<div class="brand"><img alt="Sub 230" class="brand-logo-img" src="header-mark-192-v63.png"/><div><strong>SUB 230</strong><small>Dein Lauf-Cockpit</small></div></div>
+<div class="side-head">MENÜ</div>
+<nav aria-label="Navigation" class="desktop-nav">
+<button class="nav-btn active" data-tab="overview"><span>◫</span> Übersicht</button>
+<button class="nav-btn" data-tab="plan"><span>▦</span> Trainingsplan</button>
+<button class="nav-btn" data-tab="progress"><span>↗</span> Fortschritt</button>
+<button class="nav-btn" data-tab="coach"><span>✦</span> KI-Coach</button>
+<button class="nav-btn" data-tab="settings"><span>⚙</span> Einstellungen</button>
+</nav>
+<div class="side-bottom"><span class="status-dot"></span><span id="sideSync">Lokaler Modus</span></div>
+</aside>
+<div class="workspace">
+<header class="topbar">
+<div class="mobile-brand"><img alt="Sub 230" class="brand-logo-img small" src="header-mark-192-v63.png"/><strong>SUB 230</strong></div>
+<div class="top-caption">HALBMARATHON · 04.04.2027</div>
+<div class="top-right"><span class="pill small"><span class="pulse-dot"></span><span id="topSync">Lokal</span></span></div>
+</header>
+<main class="main" id="main">
+<section class="tab-page active" data-page="overview">
+<div class="page-heading"><div><p class="eyebrow">DEIN PERSÖNLICHER LAUFCOACH</p><h1>Ein Lauf nach dem anderen<span class="accent">.</span></h1><p class="lead">Du musst Laufen nicht lieben. Du musst nur dranbleiben.</p></div><div class="header-actions"><button class="btn outline" id="syncNow">↻ Daten abrufen</button><button class="btn primary" data-show="plan">↗ Nächstes Training</button></div></div>
+<div class="hero-grid">
+<div class="goal-card card"><div class="goal-main"><div><span class="eyebrow light">DEIN ZIEL</span><div class="goal-number">2:30</div><div class="goal-sub">Halbmarathon · 21,1 km</div></div><div class="goal-side"><small>Wettkampf</small><strong id="raceText">04.04.2027</strong><small>Aktueller Schwerpunkt</small><strong id="phaseText">Grundlage aufbauen</strong></div></div><div class="goal-countdown"><span>NOCH BIS ZUM WETTKAMPF</span><strong id="raceCountdown">– Tage</strong></div></div>
+<div class="coach-snapshot card next-workout-card"><div class="card-head"><div><p class="eyebrow">NÄCHSTES TRAINING</p><h2 id="nextWorkoutTitle">Lauf 1 · Locker</h2></div><div class="round-icon">↗</div></div><p id="nextWorkoutDate">Dienstag · 4,0 km</p><div class="next-workout-stats"><span class="hero-tag" id="nextWorkoutPace">7:15–8:15 min/km</span><span class="hero-tag alt" id="nextWorkoutZone">Zone 2</span></div><p class="compact-note" id="nextWorkoutHint">Ganz locker bleiben und auf gleichmäßige Atmung achten.</p><div class="insight-footer"><div class="insight-dot">i</div><span id="nextWorkoutFooter">Tippe auf „Trainingsplan“, wenn du die komplette Einheit sehen oder anpassen willst.</span></div></div>
+</div>
+<div class="stat-grid">
+<div class="card stat"><span class="stat-title">Läufe diese Woche</span><div><strong id="statRuns">0 / 2</strong><span class="stat-icon">◷</span></div><small id="statRunsSub">Die Woche hat gerade begonnen</small></div>
+<div class="card stat"><span class="stat-title">Gesamte Kilometer</span><div><strong id="statKm">0,0 <em>km</em></strong><span class="stat-icon">↗</span></div><small id="statKmSub">Noch keine Läufe protokolliert</small></div>
+<div class="card stat"><span class="stat-title">Längster Lauf</span><div><strong id="statLong">–</strong><span class="stat-icon">◈</span></div><small id="statLongSub">Noch keine Laufdaten</small></div>
+</div><div class="card section-card"><div class="card-head"><div><p class="eyebrow">WOCHE FÜR WOCHE</p><h2>Deine letzten 4 Wochen</h2></div><button class="text-btn" data-show="progress">Alle Läufe →</button></div><div class="week-breakdown" id="recentWeeks"></div><div class="soft-note">Die laufende Woche ist noch nicht abgeschlossen. Das Ziel sind zwei Lauf-Einheiten, keine perfekte Serie.</div></div>
+<div aria-label="Dein Trainingsstand" class="card section-card trajectory-card">
+<div class="card-head"><div><p class="eyebrow">SUB 2:30 · AKTUELLER STAND</p><h2>Was deine Daten wirklich sagen</h2></div><span class="track-state" id="readinessTag">Noch keine Daten</span></div>
+<p class="muted" id="readinessText">Erst mit mehreren echten Läufen können wir das Ziel besser einschätzen.</p>
+<div class="readiness-grid">
+<div class="readiness-metric"><span>Trainingsroutine</span><strong id="adherenceMetric">–</strong><small id="adherenceCaption">Abgeschlossene Wochen mit 2+ Läufen</small></div>
+<div class="readiness-metric"><span>Distanzgrundlage</span><strong id="distanceMetric">–</strong><small id="distanceCaption">Nächster sinnvoller Meilenstein</small></div>
+<div class="readiness-metric"><span>10-km-Testlauf</span><strong id="testMetric">Noch offen</strong><small>Im Februar/März nach ausreichender Grundlage</small></div>
+</div>
+<p class="readiness-disclaimer">Trainingsindikatoren, keine Leistungsprognose. Dein Belastungsempfinden und deine Regeneration zählen ebenfalls.</p>
+</div><div class="card section-card"><div class="card-head"><div><p class="eyebrow">NÄCHSTER MEILENSTEIN</p><h2 id="nextMilestoneTitle">Deine ersten Läufe</h2></div></div><div class="next-milestone"><strong id="nextMilestoneValue">4 km</strong><span id="nextMilestoneText">Erst einmal zwei lockere Läufe pro Woche etablieren.</span></div><div class="bar-track next-milestone-bar"><div class="bar-fill" id="nextMilestoneBar" style="width:0%"></div></div><p class="hint">Die Distanz zählt erst, wenn sie tatsächlich gelaufen wurde. Rückschritte oder Entlastungswochen sind normal.</p><button class="btn outline wide" data-show="plan">Roadmap öffnen →</button></div>
+<div class="two-col">
+<div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEIN NÄCHSTER SCHRITT</p><h2>Diese Woche</h2></div><button class="text-btn" data-show="plan">Ganzer Plan →</button></div><p class="soft-note" id="motivationText">Zwei Läufe pro Woche sind dein Wochenziel – ohne Nachholen.</p><div id="weekSessions"></div><div class="soft-note">Wenn du müde oder nicht erholt bist: Einheit verkürzen oder verschieben.</div></div>
+<div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEIN FORTSCHRITT</p><h2>Auf dem Weg zu 21,1 km</h2></div></div><div class="milestone-list" id="miniMilestones"></div><button class="btn outline wide" data-show="progress">Fortschritt ansehen ↗</button></div>
+</div>
+</section>
+<section class="tab-page" data-page="plan">
+<div class="page-heading"><div><p class="eyebrow">DEINE ROADMAP</p><h1>Das wird dein Weg<span class="accent">.</span></h1><p class="lead">Zwei Läufe pro Woche bis Sonntag, 4. April 2027. Erholung ist Teil des Plans.</p></div></div>
+<div class="card section-card detailed-plan">
+<div class="card-head plan-nav-heading"><div><p class="eyebrow">TRAININGSEINHEITEN</p><h2 id="planWeekTitle">Woche 1</h2></div><div class="plan-picker"><label for="weekPicker">Woche ansehen<select id="weekPicker"></select></label><span class="pill" id="planWeekDates"></span></div></div>
+<div class="week-meta" id="weekMeta"></div>
+<div class="session-details" id="planSessions"></div>
+<div class="edit-card hidden" id="workoutEditCard">
+<div class="card-head"><div><p class="eyebrow">INDIVIDUELLE ANPASSUNG</p><h2>Training bearbeiten</h2></div><button class="text-btn" id="closeWorkoutEdit" type="button">Schließen ✕</button></div>
+<form class="form-grid" id="workoutEditForm">
+<label>Datum (aus deinen Trainingstagen)<input id="editDate" readonly="" type="date"/></label>
+<label>Bezeichnung<input id="editTitle" maxlength="80" required=""/></label>
+<label>Distanz in km<input id="editDistance" max="22" min="0.5" required="" step="0.1" type="number"/></label>
+<label>Pulszone<select id="editZone"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+<label>Schnellere Pace-Grenze (min/km)<input id="editPaceFrom" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="7:30" required=""/></label>
+<label>Langsamere Pace-Grenze (min/km)<input id="editPaceTo" inputmode="numeric" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="8:30" required=""/></label>
+<label class="full">Belastung / RPE<input id="editRpe" maxlength="50" placeholder="2–4 / 10"/></label>
+<label class="full">Ablauf<textarea id="editStructure" maxlength="600" required="" rows="3"></textarea></label>
+<label class="full">Begründung / Hinweis<textarea id="editReason" maxlength="400" rows="2"></textarea></label>
+<div class="full actions"><button class="btn primary" type="submit">Änderung speichern</button></div>
+</form>
+</div>
+<div class="soft-note compact" id="planSafetyNote">Änderungen bleiben lokal gespeichert.</div>
+</div><div class="plan-intro-grid">
+<div class="card section-card plan-summary-card">
+<p class="eyebrow">SO TRAINIERST DU</p><h2>Konkrete Vorgaben, ohne Tempodruck</h2>
+<div class="pace-guide-grid">
+<div><span>Lockerer Lauf</span><strong>ca. 7:15–8:15 /km</strong><small>RPE 2–4 / 10 · ganze Sätze möglich</small></div>
+<div><span>Langer Lauf</span><strong>ca. 7:25–8:40 /km</strong><small>RPE 2–4 / 10 · bei Bedarf Gehpausen</small></div>
+<div><span>Halbmarathon-Ziel</span><strong>7:06 /km</strong><small>Wettkampfpace, NICHT die Pace für lockere Läufe</small></div>
+</div>
+<p class="hint">Diese Pace-Spannen sind vorläufige Orientierung, keine individuelle Leistungsdiagnose. Bei Widerspruch haben Gesprächstest, Atmung und Belastungsgefühl Vorrang. Nicht auf Biegen und Brechen in der Spanne bleiben.</p>
+</div>
+<div class="card section-card plan-zones-card">
+<div class="card-head"><div><p class="eyebrow">PULSSTEUERUNG</p><h2>Einfach auf die Uhr schauen</h2></div><span class="pill">Ohne bpm-Eingabe</span></div>
+<div class="pace-guide-grid">
+<div><span>Lockere und lange Läufe</span><strong>Zone 2</strong><small>So locker, dass du ganze Sätze sprechen kannst</small></div>
+<div><span>Optionale flottere Abschnitte</span><strong>Zone 3</strong><small>Erst später im Plan – nur wenn du dich gut fühlst</small></div>
+</div>
+<p class="hint">Die Garmin-Uhr zeigt deine individuellen Zonen. Ihre Grenzen können geschätzt sein: Falls Zone 2 nicht zum lockeren Gesprächsgefühl passt, hat dein Körpergefühl Vorrang.</p>
+</div>
+</div><div class="card section-card"><div class="card-head"><div><p class="eyebrow">VORAUSSCHAU</p><h2>Die nächsten Trainingswochen</h2></div></div><div class="training-horizon" id="trainingHorizon"></div></div><div class="card section-card"><div class="card-head"><div><p class="eyebrow">LANGFRISTIG</p><h2>Deine Meilensteine</h2></div></div><div id="roadmap"></div></div><div class="card section-card" id="coachImportCard">
+<div class="card-head"><div><p class="eyebrow">VOM COACH ÜBERNEHMEN</p><h2>Trainingsempfehlung importieren</h2></div><span class="pill" id="planChangesCount">0 Änderungen</span></div>
+<p class="muted">Füge hier nur bei Bedarf einen <strong>ROAD230_UPDATE</strong>-Block aus deinem Coaching-Chat ein und bestätige danach die Vorschau.</p>
+<label for="importText">Coaching-Block hier einfügen<textarea id="importText" placeholder='ROAD230_UPDATE
 {"version":1,"workouts":[{"date":"2026-10-22","distanceKm":4,"paceFrom":"7:30","paceTo":"8:30","zone":2,"title":"Längerer Lauf","structure":"4 km locker laufen","reason":"Angepasste Belastung"}]}
-END_ROAD230_UPDATE'></textarea></label>
-            <div class="actions"><button class="btn outline" id="checkImport">Änderungen prüfen</button><button class="btn primary" disabled id="applyImport">Geprüfte Änderungen übernehmen</button></div>
-            <div id="importPreview" class="import-preview" aria-live="polite"></div>
-            
-          </div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">VORAUSSCHAU</p><h2>Die nächsten Trainingswochen</h2></div></div><div class="training-horizon" id="trainingHorizon"></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">LANGFRISTIG</p><h2>Deine Meilensteine</h2></div></div><div id="roadmap"></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DRANBLEIBEN</p><h2>Kalendererinnerungen · Dienstag und Donnerstag</h2></div></div><p class="muted">Wähle deine Trainingstage und Uhrzeiten. Die App erstellt zwei wiederkehrende Kalendereinträge mit Erinnerung 30 Minuten vorher.</p><div class="reminder-grid"><label>Lockerer Lauf<select id="easyDay"><option value="1">Montag</option><option value="2" selected>Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="easyTime" value="18:00"></label><label>Langer Lauf<select id="longDay"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4" selected>Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input type="time" id="longTime" value="18:00"></label></div><button class="btn primary" id="downloadReminders">↓ Kalendererinnerungen erstellen</button></div>
-        </section>
-        <section class="tab-page" data-page="progress">
-          <div class="page-heading"><div><p class="eyebrow">DEIN TRAINING</p><h1>Fortschritt statt Perfektion<span class="accent">.</span></h1><p class="lead">Hier erscheinen die Läufe aus Intervals.icu oder deine manuellen Einträge.</p></div><button class="btn primary" id="addRunTop">+ Lauf eintragen</button></div>
-          <div class="stat-grid"><div class="card stat"><span class="stat-title">Gesamte Laufkilometer</span><div><strong id="progressAll">0 km</strong></div></div><div class="card stat"><span class="stat-title">Protokollierte Läufe</span><div><strong id="progressCount">0</strong></div></div><div class="card stat"><span class="stat-title">Längster Lauf</span><div><strong id="progressLongest">–</strong></div></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">LETZTE 8 WOCHEN</p><h2>Laufkilometer pro Woche</h2></div></div><div id="weeklyChart" class="chart"></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">KONSTANZ</p><h2>Deine Wochen im Überblick</h2></div></div><div id="progressWeeks" class="week-breakdown"></div><p class="hint">Zwei Läufe/Woche sind dein Standardziel. Andere Aktivitäten zählen hier nicht als Lauf.</p></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">LAUFTAGEBUCH</p><h2>Deine Aktivitäten</h2></div><button class="text-btn" id="addRunInline">+ Hinzufügen</button></div><div id="activityList" class="activity-list"></div></div>
-          <div class="two-col"><div class="card section-card"><p class="eyebrow">TEMPO & PULS</p><h2>Vergleichbare Läufe</h2><p id="fitnessTrend" class="muted"></p><p class="hint">Nur Läufe mit ähnlichem Durchschnittspuls und ähnlicher Distanz werden verglichen.</p></div><div class="card section-card"><p class="eyebrow">WETTKAMPFZEIT</p><h2>Sub-2:30-Einschätzung</h2><p id="raceForecast" class="muted"></p><p class="hint">Grobe Orientierung, kein Versprechen. Nicht allein aus einer Einzelpace abgeleitet.</p></div></div>
-          <div class="card section-card hidden" id="feedbackCard"><div class="card-head"><div><p class="eyebrow">KURZER CHECK-IN</p><h2 id="feedbackRunTitle">Wie war dein Lauf?</h2></div><button class="text-btn" id="closeFeedback">Schließen ✕</button></div><form id="feedbackForm" class="form-grid"><label>Wie anstrengend war es?<select id="feedbackRpe"><option value="">Noch nicht bewertet</option><option value="2">2 – Sehr locker</option><option value="3">3 – Locker</option><option value="4">4 – Gut machbar</option><option value="5">5 – Mittel</option><option value="6">6 – Deutlich anstrengend</option><option value="7">7 – Hart</option><option value="8">8 – Sehr hart</option><option value="9">9 – Extrem hart</option><option value="10">10 – Voll am Limit</option></select></label><label class="full">Wie ging es dir dabei?<textarea id="feedbackNotes" rows="3" placeholder="Zum Beispiel: Beine müde, Atmung aber gut."></textarea></label><label class="checkbox-row full"><input type="checkbox" id="feedbackWarning"><span>Warnsignal: Schmerzen, Krankheit oder auffällige Erschöpfung (Coach informieren)</span></label><label class="checkbox-row full"><input type="checkbox" id="feedbackTest"><span>Das war ein bewusst gelaufener 10-km-Test (nur bei ca. 10 km markieren)</span></label><div class="full actions"><button class="btn primary" type="submit">Feedback speichern</button></div></form></div>
-          <div class="card section-card hidden" id="entryCard"><div class="card-head"><div><h2>Lauf eintragen</h2></div><button class="text-btn" id="closeEntry">Schließen ✕</button></div><form id="manualForm" class="form-grid"><label>Datum<input type="date" id="runDate" required></label><label>Distanz (km)<input type="number" step="0.01" min="0.1" max="100" id="runDistance" required placeholder="4.20"></label><label>Dauer (Minuten)<input type="number" step="0.1" min="1" max="1000" id="runMinutes" required placeholder="30"></label><label>Puls Ø (optional)<input type="number" min="40" max="240" id="runHr" placeholder="150"></label><label>Belastung (1–10)<select id="runRpe"><option value="">–</option><option value="2">2 – Sehr locker</option><option value="3">3 – Locker</option><option value="4">4 – Gut machbar</option><option value="5">5 – Mittel</option><option value="6">6 – Deutlich anstrengend</option><option value="7">7 – Hart</option><option value="8">8 – Sehr hart</option><option value="9">9 – Extrem hart</option><option value="10">10 – Voll am Limit</option></select></label><label class="full">Wie war es?<textarea id="runNotes" rows="3" placeholder="Zum Beispiel: Beine schwer, aber gute Atmung."></textarea></label><div class="full actions"><button class="btn primary" type="submit">Lauf speichern</button></div></form></div>
-        </section>
-        <section class="tab-page" data-page="coach">
-          <div class="page-heading"><div><p class="eyebrow">DEIN PERSÖNLICHER COACH</p><h1>Deine Daten. Mein Feedback<span class="accent">.</span></h1><p class="lead">Du nutzt deinen separaten Laufcoach-Chat in ChatGPT. Keine zusätzliche KI-API und keine neue Rechnung.</p></div></div>
-          <div class="coach-grid"><div class="card section-card"><div class="card-head"><div><p class="eyebrow">COACHING-BRIEFING</p><h2>Bereit zum Besprechen</h2></div><div class="round-icon">✦</div></div><p class="muted">Aus deinen erfassten Läufen wird eine kompakte Zusammenfassung erstellt. Du kopierst sie und fügst sie in diesen Chat ein. Die Daten verlassen das Gerät erst, wenn du sie selbst teilst.</p><div class="summary-preview" id="coachPreview"></div><div class="button-stack"><button class="btn primary wide" id="copyCoaching">▣ Zusammenfassung kopieren</button><a class="btn outline wide center" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">↗ ChatGPT öffnen</a></div><p class="hint">Öffne in ChatGPT deinen separaten Laufcoach-Chat und füge den kopierten Text ein. Wenn der Coach einen ROAD230_UPDATE-Block ergänzt, kannst du ihn im Trainingsplan unter „Trainingsempfehlung importieren“ übernehmen. Eine echte Chat-Einbettung ist ohne eigene API hier nicht enthalten.</p></div><div class="card section-card"><p class="eyebrow">WIE WIR ZUSAMMENARBEITEN</p><h2>Nach jedem Lauf, ohne Aufwand</h2><div class="step-line"><span>1</span><p>Garmin aufzeichnen und synchronisieren lassen – oder Lauf manuell eintragen.</p></div><div class="step-line"><span>2</span><p>Bei Bedarf kurz Anstrengung und Gefühl notieren.</p></div><div class="step-line"><span>3</span><p>Zusammenfassung kopieren, ChatGPT öffnen und hier Feedback bekommen.</p></div><div class="soft-note">Unser Ziel bleibt Sub 2:30, aber wir beurteilen deine Wettkampfform erst nach längeren Trainingsläufen und einem aussagekräftigen Test.</div></div></div>
-        </section>
-        <section class="tab-page" data-page="settings">
-          <div class="page-heading"><div><p class="eyebrow">EINRICHTUNG & DATENSCHUTZ</p><h1>Alles in deiner Hand<span class="accent">.</span></h1><p class="lead">Dein Dashboard läuft lokal im Browser. Es gibt keinen eigenen Account, Server oder kostenpflichtigen KI-Dienst.</p></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">GARMIN-VERBINDUNG</p><h2>Intervals.icu anbinden</h2></div></div><div class="setup-steps"><div class="step-line"><span>1</span><p>Erstelle bei <a href="https://intervals.icu/" target="_blank" rel="noopener noreferrer">Intervals.icu</a> ein kostenloses Konto und verknüpfe es unter <a href="https://intervals.icu/settings" target="_blank" rel="noopener noreferrer">Einstellungen</a> mit Garmin Connect.</p></div><div class="step-line"><span>2</span><p>Erstelle unter „Developer Settings“ einen persönlichen API-Schlüssel. <strong>Teile ihn nicht im Chat.</strong></p></div><div class="step-line"><span>3</span><p>Trage ihn hier ein. Wir fragen die offizielle Intervals.icu-Schnittstelle direkt von deinem Gerät ab.</p></div></div><label class="block-label" for="icuKey">Dein persönlicher Intervals.icu API-Schlüssel</label><div class="input-row"><input type="password" id="icuKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Nur hier auf deinem eigenen Gerät eingeben"><button class="btn outline" id="toggleKey">Anzeigen</button></div><label class="checkbox-row"><input type="checkbox" id="rememberKey"><span>Schlüssel auf diesem Gerät speichern (bequemer, aber weniger sicher bei gemeinsam genutzten Geräten)</span></label><div class="actions"><button class="btn primary" id="connectIcu">↻ Verbindung testen und synchronisieren</button><button class="btn outline" id="forgetKey">Schlüssel entfernen</button></div><div id="syncMessage" class="message" role="status">Noch nicht verbunden. Du kannst die App trotzdem nutzen.</div><div class="warning-note"><strong>Hinweis, Oktober 2026:</strong> Garmin schränkt möglicherweise die Weitergabe von Trainingsdaten über Drittanbieter-APIs ein. Wenn die Verbindung keine Aktivitäten liefert, ist das nicht unbedingt dein Fehler. Dann vorerst den manuellen Eintrag verwenden. Automatische Aktualisierung erfolgt nur beim Öffnen oder Tippen auf „Daten abrufen“, nicht im Hintergrund.</div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEIN PRIVATER COACHING-KONTEXT</p><h2>Optionaler Hintergrund</h2></div></div><p class="muted">Die Informationen bleiben lokal in diesem Browser und werden nur in die Zwischenablage übernommen, wenn du einen Coaching-Bericht kopierst. Sie stehen nicht im öffentlichen GitHub-Code.</p><label for="profileNotes">Was sollte der Coach über dich wissen?<textarea id="profileNotes" maxlength="600" rows="3" placeholder="Zum Beispiel sportliche Vorerfahrung, Trainingserfahrung, Motivation"></textarea></label><div class="actions"><button class="btn outline" id="saveProfile">Kontext lokal speichern</button></div></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">SICHERHEIT</p><h2>Was ist öffentlich?</h2></div></div><p class="muted"><strong>Öffentlich:</strong> die Website-Dateien und ihr Quellcode. <strong>Nur auf diesem Gerät:</strong> deine Laufdaten, Notizen, Anpassungen und ein eventuell gespeicherter API-Schlüssel. Es gibt keinen App-Login und keine Gerätesynchronisierung.</p><p class="warning-note">Dein API-Schlüssel ist im Browser nicht verschlüsselt. Auf gemeinsam genutzten Geräten „Schlüssel speichern“ abwählen und ihn nach Nutzung entfernen. Externe Browser-Erweiterungen, Schadsoftware oder manipulierter Code können Browserdaten möglicherweise auslesen. JSON-Backups enthalten persönliche Trainingsdaten, aber keinen API-Schlüssel – niemals öffentlich hochladen.</p></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">ZIELTERMIN</p><h2>Dein Wettkampftag</h2></div></div><p class="lead"><strong>Sonntag, 4. April 2027</strong> · Halbmarathon · Ziel unter 2:30 h</p><p class="hint">Die 24 Trainingswochen und die letzte Entlastungswoche sind auf dieses Datum ausgerichtet.</p></div>
-          <div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEINE DATEN</p><h2>Sichern und verwalten</h2></div></div><p class="muted">Läufe, Coaching-Notizen und individuelle Trainingsplan-Änderungen bleiben in diesem Browser gespeichert. Für iPhone und Laptop separat importieren und regelmäßig ein Backup sichern. Kein automatischer Abgleich zwischen Geräten.</p><div class="actions"><button class="btn outline" id="backupData">↓ JSON-Backup erstellen</button><label class="btn outline file-button">↑ Backup importieren<input type="file" id="restoreFile" accept="application/json,.json" hidden></label><button class="btn dangerous" id="resetData">Lokale Daten löschen</button></div><p class="hint">Auf GitHub Pages liegt nur der Programmcode. Bitte niemals deinen API-Schlüssel in Dateien oder GitHub hochladen.</p></div>
-        </section>
-      </main>
-      <footer class="footer">SUB 230 · Version 6.3 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
-    </div>
-  </div>
-  <nav class="bottom-nav" aria-label="Mobile Navigation"><button data-tab="overview" class="active"><span>◫</span><small>Home</small></button><button data-tab="plan"><span>▦</span><small>Plan</small></button><button data-tab="progress"><span>↗</span><small>Training</small></button><button data-tab="coach"><span>✦</span><small>Coach</small></button><button data-tab="settings"><span>⚙</span><small>Mehr</small></button></nav>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=6.3" defer></script>
-</body>
+END_ROAD230_UPDATE' rows="6" spellcheck="false"></textarea></label>
+<div class="actions"><button class="btn outline" id="checkImport">Änderungen prüfen</button><button class="btn primary" disabled="" id="applyImport">Geprüfte Änderungen übernehmen</button></div>
+<div aria-live="polite" class="import-preview" id="importPreview"></div>
+</div><div class="card section-card"><div class="card-head"><div><p class="eyebrow">DRANBLEIBEN</p><h2>Kalendererinnerungen · Dienstag und Donnerstag</h2></div></div><p class="muted">Wähle deine Trainingstage und Uhrzeiten. Die App erstellt zwei wiederkehrende Kalendereinträge mit Erinnerung 30 Minuten vorher.</p><div class="reminder-grid"><label>Lockerer Lauf<select id="easyDay"><option value="1">Montag</option><option selected="" value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input id="easyTime" type="time" value="18:00"/></label><label>Langer Lauf<select id="longDay"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option selected="" value="4">Donnerstag</option><option value="5">Freitag</option><option value="6">Samstag</option><option value="0">Sonntag</option></select></label><label>Uhrzeit<input id="longTime" type="time" value="18:00"/></label></div><button class="btn primary" id="downloadReminders">↓ Kalendererinnerungen erstellen</button></div></section>
+<section class="tab-page" data-page="progress">
+<div class="page-heading"><div><p class="eyebrow">DEIN TRAINING</p><h1>Fortschritt statt Perfektion<span class="accent">.</span></h1><p class="lead">Hier erscheinen die Läufe aus Intervals.icu oder deine manuellen Einträge.</p></div><button class="btn primary" id="addRunTop">+ Lauf eintragen</button></div>
+<div class="stat-grid"><div class="card stat compact-stat"><span class="stat-title">Gesamte Laufkilometer</span><div><strong id="progressAll">0 km</strong></div></div><div class="card stat compact-stat"><span class="stat-title">Protokollierte Läufe</span><div><strong id="progressCount">0</strong></div></div><div class="card stat compact-stat"><span class="stat-title">Längster Lauf</span><div><strong id="progressLongest">–</strong></div></div></div>
+<div class="card section-card"><div class="card-head"><div><p class="eyebrow">LETZTE 8 WOCHEN</p><h2>Laufkilometer pro Kalenderwoche</h2></div></div><div class="chart" id="weeklyChart"></div></div>
+<div class="card section-card"><div class="card-head"><div><p class="eyebrow">LAUFTAGEBUCH</p><h2>Absolvierte Trainings</h2></div><button class="text-btn" id="addRunInline">+ Hinzufügen</button><label class="training-filter">Zeitraum <select id="trainingWeekFilter"><option value="all">Alle Wochen</option></select></label></div><div class="activity-list" id="activityList"></div><div aria-live="polite" class="run-details hidden" id="runDetails"></div></div>
+<div class="two-col"><div class="card section-card"><p class="eyebrow">TEMPO &amp; PULS</p><h2>Vergleichbare Läufe</h2><p class="muted" id="fitnessTrend"></p><p class="hint">Nur Läufe mit ähnlichem Durchschnittspuls und ähnlicher Distanz werden verglichen.</p></div><div class="card section-card"><p class="eyebrow">WETTKAMPFZEIT</p><h2>Sub-2:30-Einschätzung</h2><p class="muted" id="raceForecast"></p><p class="hint">Grobe Orientierung, kein Versprechen. Nicht allein aus einer Einzelpace abgeleitet.</p></div></div>
+<div class="card section-card hidden" id="feedbackCard"><div class="card-head"><div><p class="eyebrow">KURZER CHECK-IN</p><h2 id="feedbackRunTitle">Wie war dein Lauf?</h2></div><button class="text-btn" id="closeFeedback">Schließen ✕</button></div><form class="form-grid" id="feedbackForm"><label>Wie anstrengend war es?<select id="feedbackRpe"><option value="">Noch nicht bewertet</option><option value="2">2 – Sehr locker</option><option value="3">3 – Locker</option><option value="4">4 – Gut machbar</option><option value="5">5 – Mittel</option><option value="6">6 – Deutlich anstrengend</option><option value="7">7 – Hart</option><option value="8">8 – Sehr hart</option><option value="9">9 – Extrem hart</option><option value="10">10 – Voll am Limit</option></select></label><label class="full">Wie ging es dir dabei?<textarea id="feedbackNotes" maxlength="3000" placeholder="Zum Beispiel: Beine müde, Atmung aber gut." rows="3"></textarea></label><label class="checkbox-row full"><input id="feedbackWarning" type="checkbox"/><span>Warnsignal: Schmerzen, Krankheit oder auffällige Erschöpfung (Coach informieren)</span></label><label class="checkbox-row full"><input id="feedbackTest" type="checkbox"/><span>Das war ein bewusst gelaufener 10-km-Test (nur bei ca. 10 km markieren)</span></label><div class="full actions"><button class="btn primary" type="submit">Feedback speichern</button></div></form></div>
+<div class="card section-card hidden" id="entryCard"><div class="card-head"><div><h2>Lauf eintragen</h2></div><button class="text-btn" id="closeEntry">Schließen ✕</button></div><form class="form-grid" id="manualForm"><label>Datum<input id="runDate" required="" type="date"/></label><label>Distanz (km)<input id="runDistance" max="100" min="0.1" placeholder="4.20" required="" step="0.01" type="number"/></label><label>Dauer (Minuten)<input id="runMinutes" max="1000" min="1" placeholder="30" required="" step="0.1" type="number"/></label><label>Puls Ø (optional)<input id="runHr" max="240" min="40" placeholder="150" type="number"/></label><label>Belastung (1–10)<select id="runRpe"><option value="">–</option><option value="2">2 – Sehr locker</option><option value="3">3 – Locker</option><option value="4">4 – Gut machbar</option><option value="5">5 – Mittel</option><option value="6">6 – Deutlich anstrengend</option><option value="7">7 – Hart</option><option value="8">8 – Sehr hart</option><option value="9">9 – Extrem hart</option><option value="10">10 – Voll am Limit</option></select></label><label class="full">Wie war es?<textarea id="runNotes" maxlength="3000" placeholder="Zum Beispiel: Beine schwer, aber gute Atmung." rows="3"></textarea></label><div class="full actions"><button class="btn primary" type="submit">Lauf speichern</button></div></form></div>
+</section>
+<section class="tab-page" data-page="coach">
+<div class="page-heading"><div><p class="eyebrow">DEIN PERSÖNLICHER COACH</p><h1>Deine Daten. Mein Feedback<span class="accent">.</span></h1><p class="lead">Du nutzt deinen separaten Laufcoach-Chat in ChatGPT. Keine zusätzliche KI-API und keine neue Rechnung.</p></div></div>
+<div class="coach-grid"><div class="card section-card"><div class="card-head"><div><p class="eyebrow">COACHING-BRIEFING</p><h2>Bereit zum Besprechen</h2></div><div class="round-icon">✦</div></div><p class="muted">Aus deinen erfassten Läufen wird eine kompakte Zusammenfassung erstellt. Du kopierst sie und fügst sie in diesen Chat ein. Die Daten verlassen das Gerät erst, wenn du sie selbst teilst.</p><div class="summary-preview" id="coachPreview"></div><div class="button-stack"><button class="btn primary wide" id="copyCoaching">▣ Zusammenfassung kopieren</button><a class="btn outline wide center" href="https://chatgpt.com/" rel="noopener noreferrer" target="_blank">↗ ChatGPT öffnen</a></div><p class="hint">Öffne in ChatGPT deinen separaten Laufcoach-Chat und füge den kopierten Text ein. Wenn der Coach einen ROAD230_UPDATE-Block ergänzt, kannst du ihn im Trainingsplan unter „Trainingsempfehlung importieren“ übernehmen. Eine echte Chat-Einbettung ist ohne eigene API hier nicht enthalten.</p></div><div class="card section-card"><p class="eyebrow">WIE WIR ZUSAMMENARBEITEN</p><h2>Nach jedem Lauf, ohne Aufwand</h2><div class="step-line"><span>1</span><p>Garmin aufzeichnen und synchronisieren lassen – oder Lauf manuell eintragen.</p></div><div class="step-line"><span>2</span><p>Bei Bedarf kurz Anstrengung und Gefühl notieren.</p></div><div class="step-line"><span>3</span><p>Zusammenfassung kopieren, ChatGPT öffnen und hier Feedback bekommen.</p></div><div class="soft-note">Unser Ziel bleibt Sub 2:30, aber wir beurteilen deine Wettkampfform erst nach längeren Trainingsläufen und einem aussagekräftigen Test.</div></div></div>
+</section>
+<section class="tab-page" data-page="settings">
+<div class="page-heading"><div><p class="eyebrow">EINRICHTUNG &amp; DATENSCHUTZ</p><h1>Mehr &amp; Einstellungen</h1><p class="lead">Dein Dashboard läuft lokal im Browser. Es gibt keinen eigenen Account, Server oder kostenpflichtigen KI-Dienst.</p></div></div>
+<div class="card section-card"><div class="card-head"><div><p class="eyebrow">GARMIN-VERBINDUNG</p><h2>Intervals.icu anbinden</h2></div></div><div class="setup-steps"><div class="step-line"><span>1</span><p>Erstelle bei <a href="https://intervals.icu/" rel="noopener noreferrer" target="_blank">Intervals.icu</a> ein kostenloses Konto und verknüpfe es unter <a href="https://intervals.icu/settings" rel="noopener noreferrer" target="_blank">Einstellungen</a> mit Garmin Connect.</p></div><div class="step-line"><span>2</span><p>Erstelle unter „Developer Settings“ einen persönlichen API-Schlüssel. <strong>Teile ihn nicht im Chat.</strong></p></div><div class="step-line"><span>3</span><p>Trage ihn hier ein. Wir fragen die offizielle Intervals.icu-Schnittstelle direkt von deinem Gerät ab.</p></div></div><label class="block-label" for="icuKey">Dein persönlicher Intervals.icu API-Schlüssel</label><div class="input-row"><input autocapitalize="off" autocomplete="off" id="icuKey" placeholder="Nur hier auf deinem eigenen Gerät eingeben" spellcheck="false" type="password"/><button class="btn outline" id="toggleKey">Anzeigen</button></div><label class="checkbox-row"><input id="rememberKey" type="checkbox"/><span>Schlüssel auf diesem Gerät speichern (bequemer, aber weniger sicher bei gemeinsam genutzten Geräten)</span></label><div class="actions"><button class="btn primary" id="connectIcu">↻ Verbindung testen und synchronisieren</button><button class="btn outline" id="forgetKey">Schlüssel entfernen</button></div><div class="message" id="syncMessage" role="status">Noch nicht verbunden. Du kannst die App trotzdem nutzen.</div><p class="hint">Aktualisiert wird beim Öffnen der App und über „Daten abrufen“. Garmin-Übertragungen können einige Minuten dauern.</p></div>
+<div class="card section-card" id="weightCard"><div class="card-head"><div><p class="eyebrow">KÖRPERGEWICHT</p><h2>Gewichtsentwicklung</h2></div><span class="pill" id="weightCurrent">Noch kein Wert</span></div><p class="muted">Werte aus Intervals.icu werden beim Abrufen ergänzt. Du kannst dein Gewicht auch manuell festhalten.</p><div class="weight-form"><label>Datum<input id="weightDate" type="date"/></label><label>Gewicht in kg<input id="weightValue" max="300" min="25" placeholder="100,0" step="0.1" type="number"/></label><button class="btn primary" id="weightSave">Speichern</button></div><div aria-label="Gewichtsentwicklung" class="weight-chart" id="weightChart"></div><div class="weight-list" id="weightHistory"></div></div>
+<div class="card section-card"><div class="card-head"><div><p class="eyebrow">DEINE DATEN</p><h2>Sichern und verwalten</h2></div></div><p class="muted">Läufe, Coaching-Notizen und individuelle Trainingsplan-Änderungen bleiben in diesem Browser gespeichert. Für iPhone und Laptop separat importieren und regelmäßig ein Backup sichern. Kein automatischer Abgleich zwischen Geräten.</p><div class="actions"><button class="btn outline" id="backupData">↓ JSON-Backup erstellen</button><label class="btn outline file-button">↑ Backup importieren<input accept="application/json,.json" hidden="" id="restoreFile" type="file"/></label><button class="btn dangerous" id="resetData">Lokale Daten löschen</button></div><p class="hint">Auf GitHub Pages liegt nur der Programmcode. Bitte niemals deinen API-Schlüssel in Dateien oder GitHub hochladen.</p></div>
+</section>
+</main>
+<footer class="footer">SUB 230 · Version 7 · Trainingshinweise ersetzen keine medizinische Beratung</footer>
+</div>
+</div>
+<nav aria-label="Mobile Navigation" class="bottom-nav"><button class="active" data-tab="overview"><span>◫</span><small>Home</small></button><button data-tab="plan"><span>▦</span><small>Plan</small></button><button data-tab="progress"><span>↗</span><small>Training</small></button><button data-tab="coach"><span>✦</span><small>Coach</small></button><button data-tab="settings"><span>⚙</span><small>Mehr</small></button></nav>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+<script defer="" src="app.js?v=7"></script>
+<div aria-labelledby="modalTitle" aria-modal="true" class="modal-backdrop hidden" id="feedbackModal" role="dialog"><div class="modal-panel"><div class="card-head"><div><p class="eyebrow">LAUF ABGESCHLOSSEN</p><h2 id="modalTitle">Wie war dein Lauf?</h2></div><button aria-label="Später" class="text-btn" id="modalLater" type="button">Schließen ✕</button></div><div class="modal-summary" id="modalRunSummary">–</div><form class="form-grid" id="modalFeedbackForm"><label>Belastung (RPE)<select id="modalRpe"><option value="">Bitte wählen</option><option value="1">1 – Kaum anstrengend</option><option value="2">2 – Sehr leicht</option><option value="3">3 – Locker</option><option value="4">4 – Gut machbar</option><option value="5">5 – Mittel</option><option value="6">6 – Deutlich anstrengend</option><option value="7">7 – Hart</option><option value="8">8 – Sehr hart</option><option value="9">9 – Extrem hart</option><option value="10">10 – Maximal</option></select></label><label class="full">Wie hat sich der Lauf angefühlt?<textarea id="modalNotes" maxlength="3000" placeholder="Beine, Atmung, Gefühl, Besonderheiten …" rows="4"></textarea></label><label class="checkbox-row full"><input id="modalWarning" type="checkbox"/><span>Schmerzen, Krankheit oder starke Erschöpfung</span></label><div class="actions full"><button class="btn primary" type="submit">Feedback speichern</button><button class="btn outline" id="modalSkip" type="button">Später</button></div></form></div></div></body>
 </html>
