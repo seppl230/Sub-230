@@ -1,24 +1,27 @@
-# SUB 230 – V8
+# Sub 230 – V9
 
-**Direktes Upgrade von V7.2, V7.1 oder V7.** Alle Funktionen und Verbesserungen der vorherigen Versionen sind enthalten; Zwischenupdates sind nicht nötig.
+V9 baut direkt auf V8 auf. Keine Zwischenversion nötig.
 
-## Änderungen
+## Neu
 
-- **Coach → Vom Coach übernehmen:** Der komplette Bereich zum Übernehmen von Trainingsempfehlungen befindet sich jetzt im Reiter **Coach**, unmittelbar nach dem Coaching-Bereich. Im Trainingsplan erscheint er nicht mehr.
-- **Beide Importarten unverändert:** Einzelne Trainingsänderungen mit `ROAD230_UPDATE` Version 1 sowie dauerhafte Regeln mit Version 2. Auch die manuellen Regeln für beide Lauftage und die Vorschau vor dem Übernehmen bleiben erhalten.
-- **Darstellung korrigiert:** Lange Coaching-Berichte, Änderungszähler, Wochenfilter, Trainingskarten, Detailtabellen und Eingabe-/Schaltflächen passen sich auch an schmale Bildschirme an. Alle bisherigen Farben und das Stoppuhr-Logo bleiben gleich.
-- **Vorhandene Daten:** Garmin-Läufe, Kommentare, Pulswerte, Gewicht, Einzelanpassungen, wiederkehrende Planregeln und API-Schlüssel bleiben im bisherigen Browser-Speicher. Der gespeicherte API-Schlüssel ist **nicht** in JSON-Backups enthalten.
+- Zeitlich verknüpfte Minutenmittelwerte von Puls, Pace und Höhe mit getrennten, gleich ausgerichteten Diagrammen unter **Training → Laufdetails**.
+- Bewegungspausen/Gehen als vorsichtig formulierte Hinweise; datenbedingte Ausfälle und fragwürdige Sensorwerte werden nicht als echte Belastungswechsel interpretiert.
+- Ausführlicher Coaching-Bericht mit Minutenverlauf für die zwei neuesten Läufe, 5-Minutenverlauf für weitere dokumentierte Läufe und dem vollständigen noch anstehenden, individuell angepassten Trainingsplan.
+- Bei jedem manuellen Abruf werden die drei jüngsten Läufe erneut geladen. **Mehr → Detaildaten neu abrufen** lädt die zuletzt zwölf dokumentierten Läufe gezielt neu, auch nach Änderungen von Pulszonen in Intervals.icu.
+- Optionaler, lokal gespeicherter Hintergrund zum Läufer unter **Coach**.
+- Keine automatische Änderung des Trainingsplans: Coach-Empfehlungen müssen weiterhin ausdrücklich geprüft und übernommen werden.
 
-## Installation auf GitHub Pages
+## Installation
 
-1. **Zuerst in der alten App unter Mehr → JSON-Backup erstellen** und die Datei privat aufbewahren, niemals ins öffentliche GitHub-Repository hochladen.
-2. ZIP entpacken. **Alle enthaltenen Dateien direkt ins Stammverzeichnis** von `seppl230/Sub-230` hochladen, gleichnamige Dateien überschreiben und `Commit changes` bestätigen. Den entpackten Ordner selbst nicht hochladen.
-3. Nach dem GitHub-Pages-Deployment die bestehende Web-App aktualisieren. **Nicht vom iPhone löschen**, da sonst lokale Daten verlorengehen können. Sollte noch die alte Version erscheinen, nach einiger Zeit erneut öffnen.
+1. **In der bestehenden App vorher Mehr → JSON-Backup erstellen** und privat aufbewahren; nicht auf GitHub hochladen.
+2. ZIP entpacken; alle Dateien ins **Stammverzeichnis** von `seppl230/Sub-230` hochladen und vorhandene Dateien ersetzen.
+3. Änderungen committen und GitHub Pages aktualisieren lassen. Bestehende iPhone-Web-App **nicht löschen**, sonst droht Verlust lokaler Daten.
+4. Unter **Mehr → Detaildaten neu abrufen** prüfen, ob deine Läufe tatsächlich Puls-, Distanz- und Höhendaten liefern. Fehlt eine Zeitreihe, wird sie nicht erfunden.
+5. Unter **Coach → Zusammenfassung kopieren** den neuen Bericht in den bestehenden Coaching-Chat übertragen.
 
-## Nutzung
+## Grenzen
 
-1. Nach Garmin- und Intervals.icu-Synchronisierung auf **Daten abrufen** tippen. Für neue, noch unbewertete Läufe erscheint der RPE-/Feedback-Dialog.
-2. Unter **Coach → Zusammenfassung kopieren** den Bericht in den bestehenden ChatGPT-Coaching-Chat einfügen.
-3. Die Antwort mit `ROAD230_UPDATE` unter **Coach → Vom Coach übernehmen** einfügen, Änderungen prüfen und bewusst übernehmen. Du kannst dort auch Pace-/Zonenvorgaben für alle künftigen Einheiten manuell setzen.
-
-**Datenschutz:** Die App arbeitet weiterhin ohne zusätzliche KI-API-Kosten. Aus deinem Browser wird kein Coaching-Bericht automatisch an ChatGPT übermittelt; das erfolgt erst durch dein Kopieren/Einfügen. V8 verändert keine Trainingseinheiten von selbst.
+- Der Abruf persönlicher Intervals.icu-Daten konnte nur mit simulierten API-Antworten getestet werden. Qualität und Verfügbarkeit hängen von der dort gespeicherten Aktivität ab.
+- Pro Lauf werden kompakte Minutenmittelwerte gespeichert, **keine vollständigen Rohdaten pro Sekunde**. Für neue Berechnungen können vorhandene Aktivitäten erneut abgerufen werden.
+- Eine echte Erkennung von Gehpausen oder kardialer Drift ist allein anhand der hier verwendeten Werte nicht sicher möglich. Die App kennzeichnet mögliche Hinweise und Datenlücken.
+- Speicherung und Feedback bleiben wie bisher lokal im selben Browser, nicht automatisch zwischen iPhone und PC synchronisiert. Keine zusätzlichen Abo-/KI-API-Kosten.

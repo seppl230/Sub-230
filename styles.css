@@ -190,3 +190,12 @@ body.has-modal{overflow:hidden}
   .session-tag{white-space:normal}
   .workout-top{flex-wrap:wrap}
 }
+
+/* V9: separate, aligned running traces and compact optional coach profile */
+.timeline-graph{min-width:0;max-width:100%;overflow:hidden;border:1px solid var(--line);background:#0b1b2b;border-radius:12px;padding:10px 12px;margin:12px 0}
+.timeline-caption{font-size:12px;color:var(--muted);font-weight:760;margin:2px 0 8px}
+.timeline-graph svg{display:block;max-width:100%;height:auto;width:100%;overflow:visible}
+.coach-profile-disclosure summary{cursor:pointer;color:var(--teal);font-weight:760}
+.coach-profile-disclosure[open] summary{margin-bottom:13px}
+.coach-profile-disclosure textarea{width:100%;min-width:0}
+@media(max-width:420px){.timeline-graph{padding:8px}}

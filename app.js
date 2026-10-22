@@ -25,7 +25,7 @@ let editingFeedbackId=null;
 let inspectedWeek=null;
 function feedbackFor(r){const f=state.feedback&&state.feedback[r.id];return {rpe:f&&f.rpe!=null?f.rpe:r.rpe,note:f&&typeof f.note==='string'?f.note:(r.note||''),test10k:!!f?.test10k,warning:!!f?.warning}}
 function el(id){return document.getElementById(id)}
-function loadState(){try{const data=JSON.parse(localStorage.getItem(STORE)||'{}');return {...DEFAULT,...data,manual:Array.isArray(data.manual)?data.manual:[],synced:Array.isArray(data.synced)?data.synced:[],notes:data.notes && typeof data.notes==='object'?data.notes:{},feedback:data.feedback && typeof data.feedback==='object'?data.feedback:{},reminders:{...DEFAULT.reminders,...(data.reminders||{})},training:{},planOverrides:data.planOverrides&&typeof data.planOverrides==='object'&&!Array.isArray(data.planOverrides)?data.planOverrides:{},changeLog:Array.isArray(data.changeLog)?data.changeLog.slice(-50):[],profile:{notes:typeof data.profile?.notes==='string'?data.profile.notes.slice(0,600):''},weights:Array.isArray(data.weights)?data.weights:[],dismissedFeedback:Array.isArray(data.dismissedFeedback)?data.dismissedFeedback:[],hrZoneSettings:data.hrZoneSettings||null,planRules:Array.isArray(data.planRules)?data.planRules.slice(-50):[]}}catch{return {...DEFAULT}}}
+function loadState(){try{const data=JSON.parse(localStorage.getItem(STORE)||'{}');return {...DEFAULT,...data,manual:Array.isArray(data.manual)?data.manual:[],synced:Array.isArray(data.synced)?data.synced:[],notes:data.notes && typeof data.notes==='object'?data.notes:{},feedback:data.feedback && typeof data.feedback==='object'?data.feedback:{},reminders:{...DEFAULT.reminders,...(data.reminders||{})},training:{},planOverrides:data.planOverrides&&typeof data.planOverrides==='object'&&!Array.isArray(data.planOverrides)?data.planOverrides:{},changeLog:Array.isArray(data.changeLog)?data.changeLog.slice(-50):[],profile:{notes:typeof data.profile?.notes==='string'?data.profile.notes.slice(0,1000):''},weights:Array.isArray(data.weights)?data.weights:[],dismissedFeedback:Array.isArray(data.dismissedFeedback)?data.dismissedFeedback:[],hrZoneSettings:data.hrZoneSettings||null,planRules:Array.isArray(data.planRules)?data.planRules.slice(-50):[]}}catch{return {...DEFAULT}}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch{toast('Lokaler Speicher nicht verfügbar. Bitte Daten exportieren.')}}
 function toast(msg){const t=el('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3700)}
 function dateStr(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
@@ -291,6 +291,8 @@ function coachingText(){const all=allRuns(),recent=all.slice(0,10),last28=all.fi
   'Ziel: Halbmarathon am 04.04.2027 in unter 2:30 Stunden (Zielpace ~7:06 min/km).',
   'Training: 2 Laufeinheiten pro Woche mit ausreichend Regeneration.',
   'Ausgangspunkt: Bitte die erfassten Läufe berücksichtigen; nicht dokumentierte frühere Läufe nicht als Messwert annehmen.',
+  'Läuferprofil (selbst eingetragen): '+(coachProfileText()||'nicht hinterlegt'),
+  'Trainingssteuerung: Garmin Zone 2 = die in Intervals.icu auf Garmin abgestimmten fünf Zonen; bei Abweichungen RPE/Gesprächstest vor numerischer Zonengrenze priorisieren.',
   `Aktuelle Trainingswoche: ${weekIdx()+1}. Plan mit möglichen Anpassungen: ${sessionPrescription(0).dist} + ${sessionPrescription(1).dist}.`,
   `Einheit 1 (${sessionPrescription(0).date}): ${sessionPrescription(0).dist}, ${sessionPrescription(0).pace}, ${sessionPrescription(0).pulse}, RPE ${sessionPrescription(0).rpe}. Ablauf: ${sessionPrescription(0).structure}`, 
   `Einheit 2 (${sessionPrescription(1).date}): ${sessionPrescription(1).dist}, ${sessionPrescription(1).pace}, ${sessionPrescription(1).pulse}, RPE ${sessionPrescription(1).rpe}. Ablauf: ${sessionPrescription(1).structure}`, 
@@ -303,7 +305,7 @@ function coachingText(){const all=allRuns(),recent=all.slice(0,10),last28=all.fi
   `Trainingsanpassungen: ${Object.keys(state.planOverrides).length} individuell geänderte Einheiten; ${(state.planRules||[]).length} langfristige Pace-/Zonenvorgaben.`,
   ...((state.planRules||[]).map(r=>`Dauerhafte Vorgabe ${r.type==='easy'?'Locker':'Länger'} ab ${r.fromDate}: ${r.paceFrom}–${r.paceTo} min/km, Zone ${r.zone}, ${r.reason||''}`)),
   '', 'Neueste Läufe (Datum | Distanz | Pace | Puls | Belastung | Notiz):'
-];if(!recent.length)lines.push('Noch keine Aktivitäten erfasst.');for(const r of recent)lines.push(`${displayDate(r.date)} | ${fmtKm(r.km)} | ${minsPerKm(r.km,r.seconds)} | ${r.hr||'–'} bpm | RPE ${feedbackFor(r).rpe||'–'}${feedbackFor(r).test10k?' [10-km-Test]':''}${feedbackFor(r).warning?' [Warnsignal]':''} | ${(feedbackFor(r).note||'–').replace(/\s+/g,' ').slice(0,3000)}`);lines.push('',...recent.flatMap(r=>detailReport(r)),'','Bitte gib mir eine kurze, konkrete Einschätzung meines Trainings (ohne Bla-Bla). Bei Bedarf: Unterscheide einmalige Änderungen (Distanz/Termin) von dauerhaften Vorgaben (Pace/Zone bei allen folgenden lockeren bzw. langen Läufen). Wenn dauerhafte Änderungen begründet sind, hänge ROAD230_UPDATE, eine neue Zeile mit JSON {"version":2,"planRules":[{"type":"easy","fromDate":"YYYY-MM-DD","paceFrom":"MM:SS","paceTo":"MM:SS","zone":2,"guidance":"kurzer Praxistipp","reason":"Begründung"}],"workouts":[]} und END_ROAD230_UPDATE an. Für die zweite Laufart type:"long" verwenden. Für beide Laufarten bitte zwei Regeln angeben, wenn beide betroffen sind. Startdatum jeweils der nächste noch nicht absolvierte geplante Trainingstag der Laufart. Wenn nur eine einzelne Einheit angepasst werden soll, verwende wie bisher version:1 mit workouts. Nichts ohne nachvollziehbaren Änderungsbedarf ändern. Die langfristigen Distanzen und den Wettkampftag nicht pauschal wegen eines einzigen Laufs umschreiben. Bei zu hohem Puls den Gesprächstest, langsamere Pace und nötigenfalls Gehpausen priorisieren.', '', `Geplante Laufdaten der nächsten vier Wochen: ${Array.from({length:4},(_,n)=>Math.min(PLAN.length-1,weekIdx()+n)).map(w=>`${sessionPrescription(0,w).date} (easy) / ${sessionPrescription(1,w).date} (long)`).join("; ")}. Den Wettkampftag nicht ändern. Anpassungen vor dem Training manuell bestätigen.`);return lines.join('\n')}
+];if(!recent.length)lines.push('Noch keine Aktivitäten erfasst.');for(const r of recent)lines.push(`${displayDate(r.date)} | ${fmtKm(r.km)} | ${minsPerKm(r.km,r.seconds)} | ${r.hr||'–'} bpm | RPE ${feedbackFor(r).rpe||'–'}${feedbackFor(r).test10k?' [10-km-Test]':''}${feedbackFor(r).warning?' [Warnsignal]':''} | ${(feedbackFor(r).note||'–').replace(/\s+/g,' ').slice(0,3000)}`);lines.push('',...recent.flatMap((r,i)=>detailReport(r,i<2)),'','Verlauf und Trainingsentwicklung: '+compareRecentTraining(),'','Vollständiger restlicher Trainingsplan ab heute (zwei Einheiten pro Woche, bereits übernommene Planregeln berücksichtigt):',...futureTrainingPlan(),'','Bitte gib mir eine kurze, konkrete Einschätzung meines Trainings (ohne Bla-Bla). Bei Bedarf: Unterscheide einmalige Änderungen (Distanz/Termin) von dauerhaften Vorgaben (Pace/Zone bei allen folgenden lockeren bzw. langen Läufen). Wenn dauerhafte Änderungen begründet sind, hänge ROAD230_UPDATE, eine neue Zeile mit JSON {"version":2,"planRules":[{"type":"easy","fromDate":"YYYY-MM-DD","paceFrom":"MM:SS","paceTo":"MM:SS","zone":2,"guidance":"kurzer Praxistipp","reason":"Begründung"}],"workouts":[]} und END_ROAD230_UPDATE an. Für die zweite Laufart type:"long" verwenden. Für beide Laufarten bitte zwei Regeln angeben, wenn beide betroffen sind. Startdatum jeweils der nächste noch nicht absolvierte geplante Trainingstag der Laufart. Wenn nur eine einzelne Einheit angepasst werden soll, verwende wie bisher version:1 mit workouts. Nichts ohne nachvollziehbaren Änderungsbedarf ändern. Die langfristigen Distanzen und den Wettkampftag nicht pauschal wegen eines einzigen Laufs umschreiben. Bei zu hohem Puls den Gesprächstest, langsamere Pace und nötigenfalls Gehpausen priorisieren. Interpretiere Puls und Pace immer zeitlich gemeinsam; beachte Höhenverlauf, Datenlücken, mögliche Messartefakte und Unterschiede zwischen Bewegungszeit und Gesamtzeit. Keine klinischen Aussagen aus Pulsspitzen ableiten. Beurteile Trends nur aus vergleichbaren Läufen. Ein einzelner Lauf rechtfertigt keine drastischen Änderungen.', '', `Geplante Laufdaten der nächsten vier Wochen: ${Array.from({length:4},(_,n)=>Math.min(PLAN.length-1,weekIdx()+n)).map(w=>`${sessionPrescription(0,w).date} (easy) / ${sessionPrescription(1,w).date} (long)`).join("; ")}. Den Wettkampftag nicht ändern. Anpassungen vor dem Training manuell bestätigen.`);return lines.join('\n')}
 function fitnessTrend(){
   const runs=allRuns().filter(r=>r.hr>=75&&r.hr<=210&&r.km>=3&&r.km<=12&&r.seconds>0).slice().reverse();
   if(runs.length<3)return {message:'Für einen sinnvollen Puls-Pace-Vergleich benötigen wir mindestens 3 Läufe mit Pulswerten über 3–12 km.',ready:false};
@@ -350,31 +352,108 @@ function getArrayStream(body,type){
  if(!Array.isArray(body))return null;
  const found=body.find(x=>x&&x.type===type&&Array.isArray(x.data));return found?found.data:null;
 }
+function finite(v){return v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null}
+function round1(v){return Math.round(v*10)/10}
+function padClock(s){s=Math.round(s);return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`}
+function formatPaceValue(v){if(!Number.isFinite(v)||v<180||v>1200)return '–';return padClock(v)+' min/km'}
+function getArrayStreamAny(streams,names){for(const name of names){const arr=getArrayStream(streams,name);if(arr)return arr}return null}
 function calculateRunStreams(streams){
- const time=getArrayStream(streams,'time'),dist=getArrayStream(streams,'distance'),hr=getArrayStream(streams,'heartrate');
- if(!time||!dist||time.length!==dist.length||time.length<4)return {splits:[],halves:null};
- const splits=[],n=time.length;let startTime=Number(time[0]),startDist=Number(dist[0]),kmTarget=startDist+1000;
- let hrSum=0,hrN=0,prevDist=startDist;
- const halfD=(Number(dist[n-1])-startDist)/2,halfStats=[{hr:0,count:0},{hr:0,count:0}];
+ const times=getArrayStreamAny(streams,['time']),dist=getArrayStreamAny(streams,['distance']);
+ const hr=getArrayStreamAny(streams,['heartrate']),alt=getArrayStreamAny(streams,['altitude']);
+ const vel=getArrayStreamAny(streams,['velocity_smooth','velocity']);
+ if(!Array.isArray(times)||times.length<4)return {splits:[],halves:null,timeline:[],quality:{reason:'Keine Zeitreihe verfügbar.'}};
+ const n=Math.min(50000,times.length,...[dist,hr,alt,vel].filter(Array.isArray).map(x=>x.length));
+ if(n<4)return {splits:[],halves:null,timeline:[],quality:{reason:'Zeitreihen sind nicht gleich lang.'}};
+ const start=finite(times[0]);if(start===null)return {splits:[],halves:null,timeline:[],quality:{reason:'Fehlerhafte Zeitstempel.'}};
+ const firstDist=dist?finite(dist[0]):null;
+ const totalDistance=dist&&firstDist!==null?finite(dist[n-1])-firstDist:null;
+ const halfway=totalDistance!==null&&totalDistance>0?firstDist+totalDistance/2:null;
+ const bins=new Map(),splits=[];
+ const halves=[{sum:0,seconds:0},{sum:0,seconds:0}];
+ let valid=0,validHr=0,motionTime=0,stopped=0,slow=0,gaps=0,bad=0,hrArtefacts=0,splitStartTime=start,splitMark=firstDist!==null?firstDist+1000:null,splitHrSum=0,splitHrSec=0;
  for(let i=1;i<n;i++){
-   const d=Number(dist[i]),prevD=Number(dist[i-1]),t=Number(time[i]),prevT=Number(time[i-1]),h=hr?Number(hr[i]):NaN;
-   if(!Number.isFinite(d)||!Number.isFinite(prevD)||!Number.isFinite(t)||!Number.isFinite(prevT)||d<prevD)continue;
-   if(Number.isFinite(h)&&h>55&&h<230){hrSum+=h;hrN++;const half=d-startDist<halfD?0:1;halfStats[half].hr+=h;halfStats[half].count++}
-   while(d>=kmTarget&&splits.length<25&&d>prevD){
-     const ratio=(kmTarget-prevD)/(d-prevD),crossTime=prevT+(t-prevT)*ratio,seconds=Math.round(crossTime-startTime);
-     if(seconds>90&&seconds<1800)splits.push({km:splits.length+1,seconds,hr:hrN?Math.round(hrSum/hrN):null});
-     startTime=crossTime;kmTarget+=1000;hrSum=0;hrN=0;
+  const ta=finite(times[i-1]),tb=finite(times[i]);if(ta===null||tb===null)continue;
+  const dt=tb-ta;if(!(dt>0)||dt>120){gaps++;continue}
+  const da=dist?finite(dist[i-1]):null,db=dist?finite(dist[i]):null;
+  const dd=da!==null&&db!==null?db-da:null;
+  if(dd!==null&&(dd<-.1||dd/dt>18)){bad++;continue}
+  const v=dd!==null?dd/dt:(vel?finite(vel[i]):null);
+  if(v!==null&&v<0||v!==null&&v>18){bad++;continue}
+  const h=hr?finite(hr[i]):null;
+  const hPrev=hr?finite(hr[i-1]):null,hNext=hr&&i+1<n?finite(hr[i+1]):null;
+  const isolatedSpike=h!==null&&hPrev!==null&&hNext!==null&&Math.abs(h-hPrev)>25&&Math.abs(h-hNext)>25&&Math.abs(hPrev-hNext)<=12;
+  if(isolatedSpike)hrArtefacts++;
+  const goodHr=h!==null&&h>=45&&h<=220&&!isolatedSpike;
+  const elevation=alt?finite(alt[i]):null;
+  // A long recording gap must not masquerade as a smooth pace or sustained heart rate.
+  if(dt>20){gaps++;continue}
+  const mid=(ta+tb)/2-start;
+  if(mid<0||mid>5*3600)continue;
+  const binNo=Math.floor(mid/60);if(binNo>=300)continue;
+  let b=bins.get(binNo);
+  if(!b){b={m:binNo+1,sec:0,moveSec:0,meters:0,hrSum:0,hrSec:0,altSum:0,altSec:0,stopSec:0,slowSec:0};bins.set(binNo,b)}
+  b.sec+=dt;valid+=dt;
+  if(goodHr){b.hrSum+=h*dt;b.hrSec+=dt;validHr+=dt}
+  if(elevation!==null){b.altSum+=elevation*dt;b.altSec+=dt}
+  if(v!==null){
+   // Low-speed intervals are hints, not conclusive detection of walking.
+   if(v<.45){b.stopSec+=dt;stopped+=dt}
+   else if(v<1.85){b.slowSec+=dt;slow+=dt}
+   if(v>=.45){b.moveSec+=dt;motionTime+=dt;const step=dd!==null?dd:v*dt;b.meters+=step}
+  }
+  if(goodHr&&halfway!==null&&db!==null){const side=db<halfway?0:1;halves[side].sum+=h*dt;halves[side].seconds+=dt}
+  if(splitMark!==null&&db!==null&&da!==null){
+   if(goodHr){splitHrSum+=h*dt;splitHrSec+=dt}
+   while(db>=splitMark&&db>da&&splits.length<25){
+    const crossing=ta+(splitMark-da)/(db-da)*dt;
+    const seconds=Math.round(crossing-splitStartTime);
+    if(seconds>=120&&seconds<1800)splits.push({km:splits.length+1,seconds,hr:splitHrSec>=10?Math.round(splitHrSum/splitHrSec):null});
+    splitStartTime=crossing;splitMark+=1000;splitHrSum=0;splitHrSec=0;
    }
+  }
  }
- let halves=null;
- if(halfStats[0].count>5&&halfStats[1].count>5){halves=[0,1].map(i=>Math.round(halfStats[i].hr/halfStats[i].count))}
- return {splits,halves};
+ const timeline=[...bins.values()].sort((a,b)=>a.m-b.m).map(b=>({
+   m:b.m,
+   hr:b.hrSec>=8?Math.round(b.hrSum/b.hrSec):null,
+   pace:b.moveSec>=8&&b.meters>=10?Math.round(1000*b.moveSec/b.meters):null,
+   altitude:b.altSec>=8?round1(b.altSum/b.altSec):null,
+   coverage:Math.round(Math.min(100,b.sec/60*100)),
+   stopSec:Math.round(b.stopSec),slowSec:Math.round(b.slowSec)
+ })).filter(b=>b.coverage>=15).slice(0,300);
+ const goodHalf=halves.every(x=>x.seconds>=30);
+ const elapsed=finite(times[n-1])-start;
+ return {
+  splits,halves:goodHalf?halves.map(x=>Math.round(x.sum/x.seconds)):null,timeline,
+  quality:{duration:Math.max(0,Math.round(elapsed||0)),covered:Math.round(valid),hrCovered:Math.round(validHr),hasDistance:!!dist,hasHeartrate:!!hr,hasAltitude:!!alt,hasVelocity:!!vel,gaps,bad,hrArtefacts,
+   reason:!timeline.length?'Keine verwertbaren Zeitreihen.':null},
+  motion:{stoppedSec:Math.round(stopped),slowSec:Math.round(slow),movingSampleSec:Math.round(motionTime)}
+ };
+}
+function timelineSummary(timeline,minutes=5){
+ if(!Array.isArray(timeline)||!timeline.length)return [];
+ const groups=new Map();
+ for(const p of timeline){const k=Math.floor((p.m-1)/minutes),b=groups.get(k)||{from:k*minutes+1,to:(k+1)*minutes,hr:[],pace:[],alt:[],stop:0,slow:0};
+   if(Number.isFinite(p.hr))b.hr.push(p.hr);if(Number.isFinite(p.pace))b.pace.push(p.pace);if(Number.isFinite(p.altitude))b.alt.push(p.altitude);b.stop+=p.stopSec||0;b.slow+=p.slowSec||0;groups.set(k,b)
+ }
+ return [...groups.values()].sort((a,b)=>a.from-b.from).map(b=>({from:b.from,to:b.to,
+  hr:b.hr.length?Math.round(b.hr.reduce((s,v)=>s+v,0)/b.hr.length):null,
+  pace:b.pace.length?Math.round(b.pace.reduce((s,v)=>s+v,0)/b.pace.length):null,
+  alt:b.alt.length?round1(b.alt.reduce((s,v)=>s+v,0)/b.alt.length):null,
+  stop:b.stop,slow:b.slow}));
+}
+function timelineTrend(timeline){
+ const data=(timeline||[]).filter(x=>Number.isFinite(x.pace)&&Number.isFinite(x.hr)&&x.pace>=240&&x.pace<=1000&&x.coverage>=50);
+ if(data.length<8)return null;
+ const cut=Math.floor(data.length/2),avg=(part,key)=>part.reduce((s,p)=>s+p[key],0)/part.length;
+ const first=data.slice(0,cut),second=data.slice(cut);
+ const p1=avg(first,'pace'),p2=avg(second,'pace'),h1=avg(first,'hr'),h2=avg(second,'hr');
+ return {paceDelta:Math.round(p2-p1),hrDelta:Math.round(h2-h1),firstPace:Math.round(p1),secondPace:Math.round(p2),firstHr:Math.round(h1),secondHr:Math.round(h2),matched:data.length};
 }
 function mapIcuActivity(a,prev,zoneSettings){
  const basic={id:'icu_'+String(a.id),name:String(a.name||'Garmin-Lauf').slice(0,90),date:String(a.start_date_local||a.start_date||'').slice(0,10),km:Number(a.distance||0)/1000,seconds:Number(a.moving_time||a.elapsed_time||0),hr:Number(a.average_heartrate)||null,maxHr:Number(a.max_heartrate)||null,elevation:a.total_elevation_gain!=null&&Number.isFinite(Number(a.total_elevation_gain))?Number(a.total_elevation_gain):null,rpe:Number(a.icu_rpe||a.perceived_exertion)||null,note:'',source:'Intervals.icu'};
  return {...basic,detail:prev?.detail||null};
 }
-async function syncIntervals(showSuccess=true){
+async function syncIntervals(showSuccess=true,force=false){
  const key=getApiKey();if(!key){showPage('settings');el('syncMessage').textContent='Bitte zuerst einen persönlichen API-Schlüssel eintragen.';toast('Zuerst Intervals.icu verbinden');return}
  const btn=el('connectIcu');btn.disabled=true;el('syncMessage').className='message';el('syncMessage').textContent='Läufe und zusätzliche Trainingsdaten laden …';
  try{
@@ -396,7 +475,7 @@ async function syncIntervals(showSuccess=true){
   try{const settings=await icuGet('/athlete/0/sport-settings/Run',key);if(settings&&Array.isArray(settings.hr_zones))zoneSettings={limits:settings.hr_zones.map(Number),names:settings.hr_zone_names||[],maxHr:settings.max_hr||null,lthr:settings.lthr||null}}catch{}
   state.hrZoneSettings=zoneSettings;
   // Request detailed data for recent runs, including activities already synced in V6.
-  const recent=runs.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12).filter(r=>!r.detail?.lastChecked||Date.now()-r.detail.lastChecked>86400000);
+  const recent=runs.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12).filter((r,i)=>force||i<3||!r.detail?.lastChecked||Date.now()-r.detail.lastChecked>86400000);
   for(let k=0;k<recent.length;k+=3){
    await Promise.all(recent.slice(k,k+3).map(async run=>{
      const activityId=encodeURIComponent(run.id.slice(4));
@@ -404,12 +483,15 @@ async function syncIntervals(showSuccess=true){
        const detail=await icuGet('/activity/'+activityId,key);
        if(!detail)return;
        let series=null;
-       try{series=await icuGet('/activity/'+activityId+'/streams.json?types=time,distance,heartrate',key)}catch{}
+       try{series=await icuGet('/activity/'+activityId+'/streams.json?types=time,distance,heartrate,altitude,velocity_smooth',key)}catch{}
        const computed=calculateRunStreams(series);
        run.maxHr=Number(detail.max_heartrate)||run.maxHr;
        run.elevation=detail.total_elevation_gain!=null&&Number.isFinite(Number(detail.total_elevation_gain))?Number(detail.total_elevation_gain):run.elevation;
        run.detail={zoneTimes:parseIcuZoneTimes(detail.icu_hr_zone_times??run.detail?.zoneTimes),zones:zoneSettings||run.detail?.zones||null,
         splits:computed.splits.length?computed.splits:run.detail?.splits||[],halves:computed.halves||run.detail?.halves||null,
+        timeline:computed.timeline.length?computed.timeline:run.detail?.timeline||[],
+        quality:computed.quality,timing:computed.motion||null,
+        elapsedSec:finite(detail.elapsed_time)||null,movingSec:finite(detail.moving_time)||null,
         elevation:run.elevation,lastChecked:Date.now()};
      }catch{} // Keep ordinary runs and existing detail data if the optional API data is unavailable.
    }));
@@ -423,7 +505,8 @@ async function syncIntervals(showSuccess=true){
   state.synced=runs;state.lastSync=new Date().toISOString();save();
   if(el('rememberKey').checked){localStorage.setItem(KEY_STORE,key);sessionStorage.removeItem(KEY_STORE)}else{sessionStorage.setItem(KEY_STORE,key);localStorage.removeItem(KEY_STORE)}
   updateSyncStatus(true);renderAll();
-  el('syncMessage').textContent=`${runs.length} Laufaktivitäten geladen. Zusätzliche Puls- und Splitdaten werden übernommen, sofern Intervals.icu sie bereitstellt. Letzter Abruf: ${new Date().toLocaleString('de-AT')}.`;
+  const ready=runs.filter(r=>r.detail?.timeline?.length).length;
+  el('syncMessage').textContent=`${runs.length} Laufaktivitäten geladen. Zeitverläufe bei ${ready} Läufen vorhanden (maximal zwölf zuletzt abgerufene). Fehlende Werte können nicht ergänzt werden. Letzter Abruf: ${new Date().toLocaleString('de-AT')}.`;
   el('syncMessage').className='message good';if(showSuccess)toast(`${runs.length} Läufe synchronisiert`);
  }catch(e){el('syncMessage').className='message error';el('syncMessage').textContent='Synchronisierung fehlgeschlagen: '+e.message;toast('Synchronisierung nicht möglich')}
  finally{btn.disabled=false}
@@ -632,6 +715,22 @@ function zoneDetail(r){const d=r.detail||{},z=d.zones||state.hrZoneSettings||nul
   const secs=t?.[i];rows.push([`Z${i+1}${names[i]?' · '+names[i]:''}`,i===0?`bis ${hi} bpm`:hi==='–'?`ab ${lo} bpm`:`${lo}–${hi} bpm`,Number.isFinite(secs)?`${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')} min${total?' · '+Math.round(100*secs/total)+'%':''}`:'nicht verfügbar']);
  }return rows;
 }
+
+function createTimelineChart(points,key,label,unit){
+ const valid=points.filter(p=>Number.isFinite(p[key]));if(valid.length<2)return null;
+ const container=document.createElement('div');container.className='timeline-graph';
+ const h=document.createElement('div');h.className='timeline-caption';h.textContent=`${label} · ${unit}`;container.append(h);
+ const ns='http://www.w3.org/2000/svg';const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 620 170');svg.setAttribute('role','img');svg.setAttribute('aria-label',`${label} über die Laufzeit`);
+ const minMinute=Math.min(...points.map(p=>p.m)),maxMinute=Math.max(...points.map(p=>p.m));
+ const values=valid.map(p=>p[key]),low=Math.min(...values),high=Math.max(...values);const padding=Math.max(1,(high-low)*.14),yLo=low-padding,yHi=high+padding;
+ const px=x=>40+(x-minMinute)/Math.max(1,maxMinute-minMinute)*560,py=y=>145-(y-yLo)/Math.max(.001,yHi-yLo)*112;
+ const line=(x1,y1,x2,y2,color,opacity=1)=>{const n=document.createElementNS(ns,'line');for(const [k,v] of Object.entries({x1,y1,x2,y2,stroke:color,'stroke-opacity':opacity,'stroke-width':'1'}))n.setAttribute(k,String(v));svg.append(n)};
+ line(40,145,600,145,'#526a7b');line(40,28,40,145,'#526a7b');
+ const runs=[];let segment=[];for(const p of points){if(!Number.isFinite(p[key])){if(segment.length)runs.push(segment);segment=[]}else segment.push(p)}if(segment.length)runs.push(segment);
+ for(const group of runs){if(group.length<2)continue;const poly=document.createElementNS(ns,'polyline');poly.setAttribute('fill','none');poly.setAttribute('stroke',key==='hr'?'#f3ae88':key==='pace'?'#6de0b3':'#99b9d3');poly.setAttribute('stroke-width','2.8');poly.setAttribute('stroke-linejoin','round');poly.setAttribute('stroke-linecap','round');poly.setAttribute('points',group.map(p=>`${px(p.m).toFixed(1)},${py(p[key]).toFixed(1)}`).join(' '));svg.append(poly)}
+ const axis=(x,y,txt,anchor)=>{const n=document.createElementNS(ns,'text');n.setAttribute('x',String(x));n.setAttribute('y',String(y));n.setAttribute('fill','#a9bdce');n.setAttribute('font-size','12');n.setAttribute('text-anchor',anchor);n.textContent=txt;svg.append(n)};
+ const shown=v=>key==='pace'?padClock(v):String(Math.round(v));axis(36,27,shown(high),'end');axis(36,149,shown(low),'end');axis(40,163,`${minMinute} min`,'start');axis(600,163,`${maxMinute} min`,'end');container.append(svg);return container;
+}
 function showRunDetails(id){const r=allRuns().find(x=>x.id===id),target=el('runDetails');if(!r)return;target.replaceChildren();target.classList.remove('hidden');const h=document.createElement('h3');h.textContent=`${displayDate(r.date)} · ${r.name||'Lauf'}`;target.append(h);
  for(const value of [`${fmtKm(r.km)}`,`${minsPerKm(r.km,r.seconds)}`,r.hr?`Ø ${r.hr} bpm`:null,r.maxHr?`Max ${r.maxHr} bpm`:null,r.elevation!=null?`↗ ${Math.round(r.elevation)} hm`:null].filter(Boolean)){
   const span=document.createElement('span');span.className='detail-chip';span.textContent=value;target.append(span)
@@ -642,16 +741,58 @@ function showRunDetails(id){const r=allRuns().find(x=>x.id===id),target=el('runD
  if(r.detail?.halves){const p=document.createElement('p');p.textContent=`Ø Puls in den Streckenhälften: ${r.detail.halves[0]} / ${r.detail.halves[1]} bpm`;target.append(p)}
  if(r.detail?.splits?.length){const h=document.createElement('h3');h.textContent='Kilometer-Splits';target.append(h,createDetailsTable(['Kilometer','Zeit','Ø Puls'],r.detail.splits.map(x=>[String(x.km),`${Math.floor(x.seconds/60)}:${String(x.seconds%60).padStart(2,'0')}`,x.hr?x.hr+' bpm':'–'])))}
  else{const p=document.createElement('p');p.textContent='Keine detaillierten Splits vorhanden.';target.append(p)}
+ if(r.detail?.timeline?.length){
+  const title=document.createElement('h3');title.textContent='Puls, Tempo und Höhe im Verlauf';target.append(title);
+  const note=document.createElement('p');note.className='hint';note.textContent='Minutenmittelwerte auf derselben Zeitachse. Fehlende Messwerte werden nicht verbunden; Pace und Puls haben getrennte Skalen.';target.append(note);
+  for(const [key,label,unit] of [['hr','Herzfrequenz','bpm'],['pace','Pace','min/km'],['altitude','Höhenprofil','m']]){
+    const graph=createTimelineChart(r.detail.timeline,key,label,unit);if(graph)target.append(graph);
+  }
+  const diag=document.createElement('p');diag.className='hint';diag.textContent=`${r.detail.timeline.length} Minutenabschnitte. Pausen/Gehen werden nur als mögliche Hinweise betrachtet. Messlücken können den Verlauf beeinflussen.`;target.append(diag);
+ }
  target.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-function detailReport(r){const d=r.detail||{},parts=[`Zusatzdaten zu ${displayDate(r.date)}:`];
+function detailReport(r,fullResolution=false){
+ const d=r.detail||{},parts=[`Zusatzdaten zu ${displayDate(r.date)}:`];
  if(r.maxHr)parts.push(`Maximalpuls: ${r.maxHr} bpm.`);
  if(r.elevation!=null)parts.push(`Höhenmeter bergauf: ${Math.round(r.elevation)} m.`);
- const zones=zoneDetail(r);parts.push(zones.length?'Herzfrequenzzonen (Intervalle / Zeit): '+zones.map(x=>x.join(' / ')).join('; '):'Pulszonendaten: nicht verfügbar.');
+ if(d.elapsedSec&&d.movingSec)parts.push(`Gesamtzeit: ${padClock(d.elapsedSec)}; in Bewegung: ${padClock(d.movingSec)}; Unterschied ${padClock(Math.max(0,d.elapsedSec-d.movingSec))}.`);
+ const zones=zoneDetail(r);parts.push(zones.length?'Herzfrequenzzonen (persönliche Grenzen / Zeit; aus Intervals.icu): '+zones.map(x=>x.join(' / ')).join('; '):'Pulszonendaten: nicht verfügbar.');
  if(d.halves)parts.push(`Ø Puls Streckenhälften: ${d.halves[0]} → ${d.halves[1]} bpm (kein isolierter Beweis für kardiale Drift).`);
- if(d.splits?.length)parts.push('Kilometer-Splits: '+d.splits.map(x=>`km${x.km} ${Math.floor(x.seconds/60)}:${String(x.seconds%60).padStart(2,'0')} ${x.hr?x.hr+'bpm':''}`).join(' | '));
+ if(d.splits?.length)parts.push('Kilometer-Splits: '+d.splits.map(x=>`km${x.km} ${padClock(x.seconds)} ${x.hr?x.hr+'bpm':'Puls fehlt'}`).join(' | '));
+ const points=d.timeline||[];
+ if(points.length){
+  const t=timelineTrend(points),q=d.quality||{};
+  parts.push(`Zeitachsen-Daten: ${points.length} Minutenabschnitte; Abdeckung ${q.covered||'–'}s, mit Puls ${q.hrCovered||'–'}s; Lücken ${q.gaps||0}; verworfene unplausible Bewegungswerte ${q.bad||0}, isolierte HR-Ausreißer ${q.hrArtefacts||0}. Fehlende Werte nicht schätzen.`);
+  const step=fullResolution?1:5;
+  const compact=step===1?points:timelineSummary(points,step);
+  parts.push(`Zeitgleich gemessener Puls/Pace/Höhe je ${step} Min. (Minute | bpm | min/km | Höhe m; null = Messwert fehlt): `+
+    compact.map(x=>{
+      const minute=step===1?x.m:`${x.from}-${x.to}`;
+      return `${minute}: ${x.hr??'–'} | ${Number.isFinite(x.pace)?padClock(x.pace):'–'} | ${x.alt??x.altitude??'–'}`
+    }).join('; '));
+  if(t)parts.push(`Vergleich verbundener Zeitabschnitte (erste/zweite Hälfte der gültigen Minuten, nicht leistungsbereinigt): Pace ${padClock(t.firstPace)}→${padClock(t.secondPace)}, Puls ${t.firstHr}→${t.secondHr} bpm; Δ Pace ${t.paceDelta>0?'+':''}${t.paceDelta}s/km, Δ Puls ${t.hrDelta>0?'+':''}${t.hrDelta} bpm. Steigung, Wärme, Pausen und Sensorfehler berücksichtigen.`);
+  if(d.timing)parts.push(`Sensorbasierte Hinweise: mindestens ${Math.round(d.timing.stoppedSec||0)}s mit sehr wenig Bewegung, ${Math.round(d.timing.slowSec||0)}s sehr langsam. Kein sicherer Nachweis für Gehpausen.`);
+  if(fullResolution){const flagged=points.filter(x=>(x.stopSec||0)>=10||(x.slowSec||0)>=20).map(x=>`Min ${x.m}: ${x.stopSec||0}s fast still, ${x.slowSec||0}s sehr langsam`).slice(0,18);if(flagged.length)parts.push('Mögliche Stopps/Gehabschnitte: '+flagged.join(' | ')+'. Nur Hinweis anhand der Geschwindigkeit.')}
+ }else parts.push('Puls-/Pace-Zeitverlauf nicht verfügbar; keine Aussage über den Verlauf erfinden.');
  const w=findWorkoutByDate(r.date);if(w){const planned=workoutData(w.week,w.index);parts.push(`Soll/Ist am ${r.date}: geplante Einheit ${planned.title}, ${planned.distanceKm} km, ${planned.paceFrom}–${planned.paceTo} min/km, Zone ${planned.zone}; tatsächlich ${fmtKm(r.km)}, ${minsPerKm(r.km,r.seconds)}.`)}
  return parts;
 }
-function init(){state.raceDate=RACE_DATE;const weekPicker=el('weekPicker');for(let i=0;i<PLAN.length;i++){const op=document.createElement('option');op.value=String(i);op.textContent=`Woche ${i+1} · ${displayDate(dateStr(addDays(START,i*7)))}`;weekPicker.append(op)}weekPicker.addEventListener('change',()=>{inspectedWeek=Number(weekPicker.value);renderPlan()});loadTrainingFields();for(const n of document.querySelectorAll('[data-tab]'))n.addEventListener('click',()=>showPage(n.dataset.tab));for(const n of document.querySelectorAll('[data-show]'))n.addEventListener('click',()=>showPage(n.dataset.show));el('syncNow').addEventListener('click',()=>syncIntervals());el('connectIcu').addEventListener('click',()=>syncIntervals());el('toggleKey').addEventListener('click',()=>{const t=el('icuKey');t.type=t.type==='password'?'text':'password';el('toggleKey').textContent=t.type==='password'?'Anzeigen':'Verbergen'});el('forgetKey').addEventListener('click',()=>{localStorage.removeItem(KEY_STORE);sessionStorage.removeItem(KEY_STORE);el('icuKey').value='';el('rememberKey').checked=false;el('syncMessage').className='message';el('syncMessage').textContent='API-Schlüssel aus diesem Browser entfernt. Bereits geladene Trainingsdaten bleiben erhalten.';updateSyncStatus(false);toast('Schlüssel entfernt')});el('downloadReminders').addEventListener('click',generateCalendar);el('addRunTop').addEventListener('click',openEntry);el('addRunInline').addEventListener('click',openEntry);el('closeEntry').addEventListener('click',()=>el('entryCard').classList.add('hidden'));el('manualForm').addEventListener('submit',writeRun);el('feedbackForm').addEventListener('submit',saveFeedback);el('closeFeedback').addEventListener('click',()=>el('feedbackCard').classList.add('hidden'));el('copyCoaching').addEventListener('click',()=>copyText(coachingText()));el('workoutEditForm').addEventListener('submit',applyManualWorkout);el('closeWorkoutEdit').addEventListener('click',closeWorkoutEditor);el('checkImport').addEventListener('click',previewCoachingImport);el('applyImport').addEventListener('click',applyCoachingImport);el('jumpCoachImport').addEventListener('click',()=>el('coachImportCard').scrollIntoView({behavior:'smooth',block:'start'}));el('makeGlobalPlan').addEventListener('click',previewGlobalPlanForm);el('clearPlanRules').addEventListener('click',resetPlanRules);el('importText').addEventListener('input',()=>{pendingImport=null;el('applyImport').disabled=true;el('importPreview').replaceChildren()});el('weightSave').addEventListener('click',saveWeight);el('weightDate').value=dateStr(new Date());el('trainingWeekFilter').addEventListener('change',()=>{el('runDetails').classList.add('hidden');renderProgress()});el('modalFeedbackForm').addEventListener('submit',saveModalFeedback);el('modalLater').addEventListener('click',()=>closeFeedbackModal());el('modalSkip').addEventListener('click',()=>closeFeedbackModal());for(const id of ['easyDay','easyTime','longDay','longTime'])el(id).addEventListener('change',persistTrainingDays);el('backupData').addEventListener('click',()=>download('sub-230-backup-'+dateStr(new Date())+'.json',JSON.stringify({app:'road230',version:'8',...state},null,2),'application/json'));el('restoreFile').addEventListener('change',async(e)=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{if(f.size>5000000)throw new Error('Datei zu groß');const o=JSON.parse(await f.text());if(o.app!=='road230'||!Array.isArray(o.manual)||!Array.isArray(o.synced))throw new Error('Ungültiges Backup');if(!confirm('Aktuelle lokale Trainingsdaten durch dieses Backup ersetzen?'))return;state={...DEFAULT,...o,raceDate:RACE_DATE,training:{},planOverrides:o.planOverrides&&typeof o.planOverrides==='object'&&!Array.isArray(o.planOverrides)?o.planOverrides:{},changeLog:Array.isArray(o.changeLog)?o.changeLog.slice(-50):[],profile:{notes:typeof o.profile?.notes==='string'?o.profile.notes.slice(0,600):''},weights:Array.isArray(o.weights)?o.weights:[],dismissedFeedback:Array.isArray(o.dismissedFeedback)?o.dismissedFeedback:[],hrZoneSettings:o.hrZoneSettings||null,planRules:Array.isArray(o.planRules)?o.planRules.slice(-50):[],reminders:{...DEFAULT.reminders,...(o.reminders||{})}};save();loadReminders();loadTrainingFields();renderAll();toast('Backup importiert')}catch(e){toast('Import fehlgeschlagen: '+e.message)}e.target.value=''});el('resetData').addEventListener('click',()=>{if(!confirm('Wirklich alle lokalen Trainingsdaten löschen? API-Schlüssel bleibt gespeichert und muss separat entfernt werden.'))return;state={...DEFAULT,training:{},reminders:{...DEFAULT.reminders},planOverrides:{},changeLog:[],profile:{notes:''},weights:[],dismissedFeedback:[],hrZoneSettings:null,planRules:[]};save();loadReminders();loadTrainingFields();renderAll();toast('Lokale Trainingsdaten gelöscht')});el('rememberKey').addEventListener('change',()=>{if(el('rememberKey').checked&&getApiKey()){localStorage.setItem(KEY_STORE,getApiKey())}else{const k=localStorage.getItem(KEY_STORE);if(k)sessionStorage.setItem(KEY_STORE,k);localStorage.removeItem(KEY_STORE)}});loadReminders();const saved=localStorage.getItem(KEY_STORE),temp=sessionStorage.getItem(KEY_STORE);if(saved){el('icuKey').value=saved;el('rememberKey').checked=true}else if(temp){el('icuKey').value=temp}renderAll();if(state.lastSync)updateSyncStatus(true);if(saved)syncIntervals(false);if('serviceWorker' in navigator && location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{})}
+function futureTrainingPlan(){
+ const upcoming=[];
+ for(let w=weekIdx();w<PLAN.length;w++)for(let i=0;i<2;i++){
+  const s=sessionPrescription(i,w);if(s.date<dateStr(new Date())&&!s.race)continue;
+  upcoming.push(`W${w+1} ${s.date} ${i===0?'Locker':'Länger'}: ${s.dist}, ${s.pace}, ${s.pulse}${s.overridden?' (individuell angepasst)':''}`);
+ }
+ return upcoming;
+}
+function compareRecentTraining(){
+ const runs=allRuns().filter(r=>r.hr>=70&&r.hr<=210&&r.seconds>0&&r.km>=2);
+ const latest=runs[0];if(!latest)return 'Keine Läufe vorhanden.';
+ const similar=runs.slice(1).find(r=>Math.abs(r.hr-latest.hr)<=8&&Math.abs(r.km-latest.km)<=Math.max(1,latest.km*.2));
+ if(!similar)return 'Noch kein gut vergleichbarer früherer Lauf (ähnliche Distanz und durchschnittliche Herzfrequenz).';
+ return `${displayDate(latest.date)} vs. ${displayDate(similar.date)}: ${minsPerKm(latest.km,latest.seconds)} vs. ${minsPerKm(similar.km,similar.seconds)} bei Ø Puls ${latest.hr} vs. ${similar.hr} bpm; grober Vergleich, Gelände und Bedingungen unbekannt.`;
+}
+function coachProfileText(){return state.profile&&typeof state.profile.notes==='string'?state.profile.notes.trim():''}
+function saveCoachProfile(){state.profile={notes:el('coachProfile').value.trim().slice(0,1000)};save();renderCoach();toast('Läuferprofil gespeichert')}
+function init(){state.raceDate=RACE_DATE;const weekPicker=el('weekPicker');for(let i=0;i<PLAN.length;i++){const op=document.createElement('option');op.value=String(i);op.textContent=`Woche ${i+1} · ${displayDate(dateStr(addDays(START,i*7)))}`;weekPicker.append(op)}weekPicker.addEventListener('change',()=>{inspectedWeek=Number(weekPicker.value);renderPlan()});loadTrainingFields();for(const n of document.querySelectorAll('[data-tab]'))n.addEventListener('click',()=>showPage(n.dataset.tab));for(const n of document.querySelectorAll('[data-show]'))n.addEventListener('click',()=>showPage(n.dataset.show));el('syncNow').addEventListener('click',()=>syncIntervals());el('connectIcu').addEventListener('click',()=>syncIntervals());el('forceDetails').addEventListener('click',()=>syncIntervals(true,true));el('toggleKey').addEventListener('click',()=>{const t=el('icuKey');t.type=t.type==='password'?'text':'password';el('toggleKey').textContent=t.type==='password'?'Anzeigen':'Verbergen'});el('forgetKey').addEventListener('click',()=>{localStorage.removeItem(KEY_STORE);sessionStorage.removeItem(KEY_STORE);el('icuKey').value='';el('rememberKey').checked=false;el('syncMessage').className='message';el('syncMessage').textContent='API-Schlüssel aus diesem Browser entfernt. Bereits geladene Trainingsdaten bleiben erhalten.';updateSyncStatus(false);toast('Schlüssel entfernt')});el('downloadReminders').addEventListener('click',generateCalendar);el('addRunTop').addEventListener('click',openEntry);el('addRunInline').addEventListener('click',openEntry);el('closeEntry').addEventListener('click',()=>el('entryCard').classList.add('hidden'));el('manualForm').addEventListener('submit',writeRun);el('feedbackForm').addEventListener('submit',saveFeedback);el('closeFeedback').addEventListener('click',()=>el('feedbackCard').classList.add('hidden'));el('copyCoaching').addEventListener('click',()=>copyText(coachingText()));el('saveCoachProfile').addEventListener('click',saveCoachProfile);el('workoutEditForm').addEventListener('submit',applyManualWorkout);el('closeWorkoutEdit').addEventListener('click',closeWorkoutEditor);el('checkImport').addEventListener('click',previewCoachingImport);el('applyImport').addEventListener('click',applyCoachingImport);el('jumpCoachImport').addEventListener('click',()=>el('coachImportCard').scrollIntoView({behavior:'smooth',block:'start'}));el('makeGlobalPlan').addEventListener('click',previewGlobalPlanForm);el('clearPlanRules').addEventListener('click',resetPlanRules);el('importText').addEventListener('input',()=>{pendingImport=null;el('applyImport').disabled=true;el('importPreview').replaceChildren()});el('weightSave').addEventListener('click',saveWeight);el('weightDate').value=dateStr(new Date());el('trainingWeekFilter').addEventListener('change',()=>{el('runDetails').classList.add('hidden');renderProgress()});el('modalFeedbackForm').addEventListener('submit',saveModalFeedback);el('modalLater').addEventListener('click',()=>closeFeedbackModal());el('modalSkip').addEventListener('click',()=>closeFeedbackModal());for(const id of ['easyDay','easyTime','longDay','longTime'])el(id).addEventListener('change',persistTrainingDays);el('backupData').addEventListener('click',()=>download('sub-230-backup-'+dateStr(new Date())+'.json',JSON.stringify({app:'road230',version:'9',...state},null,2),'application/json'));el('restoreFile').addEventListener('change',async(e)=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{if(f.size>5000000)throw new Error('Datei zu groß');const o=JSON.parse(await f.text());if(o.app!=='road230'||!Array.isArray(o.manual)||!Array.isArray(o.synced))throw new Error('Ungültiges Backup');if(!confirm('Aktuelle lokale Trainingsdaten durch dieses Backup ersetzen?'))return;state={...DEFAULT,...o,raceDate:RACE_DATE,training:{},planOverrides:o.planOverrides&&typeof o.planOverrides==='object'&&!Array.isArray(o.planOverrides)?o.planOverrides:{},changeLog:Array.isArray(o.changeLog)?o.changeLog.slice(-50):[],profile:{notes:typeof o.profile?.notes==='string'?o.profile.notes.slice(0,1000):''},weights:Array.isArray(o.weights)?o.weights:[],dismissedFeedback:Array.isArray(o.dismissedFeedback)?o.dismissedFeedback:[],hrZoneSettings:o.hrZoneSettings||null,planRules:Array.isArray(o.planRules)?o.planRules.slice(-50):[],reminders:{...DEFAULT.reminders,...(o.reminders||{})}};save();loadReminders();loadTrainingFields();el('coachProfile').value=coachProfileText();renderAll();toast('Backup importiert')}catch(e){toast('Import fehlgeschlagen: '+e.message)}e.target.value=''});el('resetData').addEventListener('click',()=>{if(!confirm('Wirklich alle lokalen Trainingsdaten löschen? API-Schlüssel bleibt gespeichert und muss separat entfernt werden.'))return;state={...DEFAULT,training:{},reminders:{...DEFAULT.reminders},planOverrides:{},changeLog:[],profile:{notes:''},weights:[],dismissedFeedback:[],hrZoneSettings:null,planRules:[]};save();loadReminders();loadTrainingFields();el('coachProfile').value='';renderAll();toast('Lokale Trainingsdaten gelöscht')});el('rememberKey').addEventListener('change',()=>{if(el('rememberKey').checked&&getApiKey()){localStorage.setItem(KEY_STORE,getApiKey())}else{const k=localStorage.getItem(KEY_STORE);if(k)sessionStorage.setItem(KEY_STORE,k);localStorage.removeItem(KEY_STORE)}});loadReminders();const saved=localStorage.getItem(KEY_STORE),temp=sessionStorage.getItem(KEY_STORE);if(saved){el('icuKey').value=saved;el('rememberKey').checked=true}else if(temp){el('icuKey').value=temp}el('coachProfile').value=coachProfileText();renderAll();if(state.lastSync)updateSyncStatus(true);if(saved)syncIntervals(false);if('serviceWorker' in navigator && location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 document.addEventListener('DOMContentLoaded',init);
